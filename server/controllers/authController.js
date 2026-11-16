@@ -227,7 +227,8 @@ export const uploadAvatar = async (req, res) => {
       return res.status(400).json({ message: 'No photo selected. Please choose a photo from your local disk.' });
     }
 
-    const avatarUrl = `/uploads/${req.file.filename}`;
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const avatarUrl = `${baseUrl}/uploads/${req.file.filename}`;
     const user = await User.findById(req.user._id);
 
     if (user) {

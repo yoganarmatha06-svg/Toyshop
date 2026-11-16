@@ -134,12 +134,12 @@ const CategoryCard = ({ category }) => {
       >
         <Link
           to={`/shop?category=${category._id}`}
-          className="group relative flex flex-col items-center p-5 rounded-3xl text-center block h-full focus:outline-none"
+          className="group relative flex flex-col items-center p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl text-center block h-full focus:outline-none"
           style={{ transformStyle: 'preserve-3d' }}
         >
           {/* Soft pastel background splash container */}
           <div
-            className="w-20 h-20 rounded-2xl flex items-center justify-center text-4xl mb-3 overflow-hidden shadow-xs relative"
+            className="w-14 h-14 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-4xl mb-2 sm:mb-3 overflow-hidden shadow-xs relative"
             style={{
               backgroundColor: catImg ? '#FFFFFF' : (category.color || '#FEE2E2'),
               transform: 'translateZ(20px)',
@@ -150,7 +150,7 @@ const CategoryCard = ({ category }) => {
                 src={catImg.src}
                 alt={catImg.alt}
                 variants={shouldReduceMotion ? {} : iconVariants}
-                className={`w-full h-full ${catImg.fit === 'contain' ? 'object-contain p-1' : 'object-cover'} rounded-2xl select-none`}
+                className={`w-full h-full ${catImg.fit === 'contain' ? 'object-contain p-1' : 'object-cover'} rounded-xl sm:rounded-2xl select-none`}
                 onError={(e) => {
                   e.currentTarget.onerror = null;
                   e.currentTarget.src =
@@ -168,14 +168,14 @@ const CategoryCard = ({ category }) => {
           </div>
 
           <h3
-            className="text-base font-bold text-slate-800 group-hover:text-pink-600 transition-colors font-heading"
+            className="text-xs sm:text-base font-bold text-slate-800 group-hover:text-pink-600 transition-colors font-heading line-clamp-1"
             style={{ transform: 'translateZ(15px)' }}
           >
             {category.name}
           </h3>
 
           <span
-            className="mt-2.5 px-3.5 py-1 rounded-full text-[11px] font-black text-white bg-green-600 shadow-xs inline-flex items-center gap-1 transition-transform duration-300 group-hover:scale-105 select-none"
+            className="mt-1.5 sm:mt-2.5 px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-black text-white bg-green-600 shadow-xs inline-flex items-center gap-1 transition-transform duration-300 group-hover:scale-105 select-none"
             style={{ backgroundColor: '#16a34a', transform: 'translateZ(10px)' }}
           >
             Explore Now

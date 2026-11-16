@@ -5,11 +5,11 @@ import toyLogo from '../../assets/logo.png';
 
 const Footer = () => {
   return (
-    <footer className="bg-slate-900 text-slate-300 mt-20 pt-16 pb-12 border-t-4 border-pink-400">
+    <footer className="bg-slate-900 text-slate-300 mt-20 pt-16 pb-24 md:pb-12 border-t-4 border-pink-400">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Value Badges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-12 border-b border-slate-800">
-          <div className="flex items-center gap-3.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pb-10 sm:pb-12 border-b border-slate-800">
+          <div className="flex items-center gap-3.5 p-2 sm:p-0 rounded-2xl bg-slate-800/30 sm:bg-transparent">
             <div className="w-12 h-12 rounded-2xl bg-amber-400/10 text-amber-400 flex items-center justify-center flex-shrink-0">
               <ShieldCheck className="w-6 h-6" />
             </div>
@@ -19,7 +19,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-3.5 p-2 sm:p-0 rounded-2xl bg-slate-800/30 sm:bg-transparent">
             <div className="w-12 h-12 rounded-2xl bg-pink-400/10 text-pink-400 flex items-center justify-center flex-shrink-0">
               <Truck className="w-6 h-6" />
             </div>
@@ -29,7 +29,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-3.5 p-2 sm:p-0 rounded-2xl bg-slate-800/30 sm:bg-transparent">
             <div className="w-12 h-12 rounded-2xl bg-sky-400/10 text-sky-400 flex items-center justify-center flex-shrink-0">
               <RefreshCw className="w-6 h-6" />
             </div>
@@ -39,7 +39,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-3.5 p-2 sm:p-0 rounded-2xl bg-slate-800/30 sm:bg-transparent">
             <div className="w-12 h-12 rounded-2xl bg-emerald-400/10 text-emerald-400 flex items-center justify-center flex-shrink-0">
               <HeartHandshake className="w-6 h-6" />
             </div>
@@ -51,7 +51,7 @@ const Footer = () => {
         </div>
 
         {/* Links Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10 py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 py-10 sm:py-12">
           {/* Brand Col */}
           <div className="space-y-4">
             <Link to="/" className="inline-block group">

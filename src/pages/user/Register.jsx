@@ -41,16 +41,16 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-white rounded-3xl p-8 sm:p-10 border border-slate-100 shadow-xl space-y-6">
+    <div className="min-h-[80vh] flex items-center justify-center px-3 sm:px-4 py-8 sm:py-12">
+      <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-slate-100 shadow-xl space-y-5 sm:space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <img
             src={toyLogo}
             alt="Toy World"
-            className="h-16 w-auto mx-auto object-contain drop-shadow-sm select-none"
+            className="h-14 sm:h-16 w-auto mx-auto object-contain drop-shadow-sm select-none"
           />
-          <h1 className="text-2xl font-black text-slate-900 font-heading">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 font-heading">
             Join the Toy World Family
           </h1>
           <p className="text-xs text-slate-500 font-medium">
@@ -137,7 +137,7 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-extrabold text-xs shadow-lg shadow-pink-200 active:scale-95 transition-all flex items-center justify-center gap-2 mt-2"
+            className="w-full min-h-[44px] py-3.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-extrabold text-xs shadow-lg shadow-pink-200 active:scale-95 transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer disabled:opacity-50"
           >
             <span>{loading ? 'Creating Account...' : 'Complete Registration'}</span>
             <ArrowRight className="w-4 h-4" />

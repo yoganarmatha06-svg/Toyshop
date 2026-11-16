@@ -62,15 +62,15 @@ const MyOrders = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8">
       {/* Confirmation Banner if redirected from checkout */}
       {confirmedOrderId && (
-        <div className="p-6 rounded-3xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-xl flex flex-col sm:flex-row items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-3xl">
+        <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-xl flex flex-col sm:flex-row items-center gap-4">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-white/20 flex items-center justify-center text-2xl sm:text-3xl">
             🎉
           </div>
           <div className="flex-1 text-center sm:text-left">
-            <h2 className="text-xl font-black font-heading">
+            <h2 className="text-lg sm:text-xl font-black font-heading">
               Hooray! Your Toy Order is Confirmed!
             </h2>
             <p className="text-xs text-white/90">
@@ -79,7 +79,7 @@ const MyOrders = () => {
           </div>
           <Link
             to="/shop"
-            className="px-5 py-2.5 rounded-full bg-white text-emerald-700 font-bold text-xs hover:bg-emerald-50 shadow-sm"
+            className="px-5 py-2.5 rounded-full bg-white text-emerald-700 font-bold text-xs hover:bg-emerald-50 shadow-sm min-h-[44px] flex items-center justify-center"
           >
             Continue Shopping
           </Link>
@@ -88,7 +88,7 @@ const MyOrders = () => {
 
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-black text-slate-900 font-heading">
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
           My Toy Orders 📦
         </h1>
         <p className="text-xs text-slate-500 font-medium">
@@ -181,7 +181,7 @@ const MyOrders = () => {
                   </div>
                 </div>
 
-                <div className="p-6 sm:p-8 space-y-6">
+                <div className="p-4 sm:p-8 space-y-5 sm:space-y-6">
                   {/* Status Timeline */}
                   {order.orderStatus !== 'Cancelled' && (
                     <div className="max-w-xl mx-auto py-2">
@@ -205,7 +205,7 @@ const MyOrders = () => {
                               {idx <= stepIndex ? '✓' : idx + 1}
                             </div>
                             <span
-                              className={`text-[11px] font-bold mt-1.5 ${
+                              className={`text-[10px] sm:text-[11px] font-bold mt-1.5 ${
                                 idx <= stepIndex ? 'text-pink-600' : 'text-slate-400'
                               }`}
                             >
@@ -232,40 +232,40 @@ const MyOrders = () => {
                           'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80';
 
                         return (
-                          <div key={idx} className="py-3.5 flex items-center gap-4 group">
+                          <div key={idx} className="py-3 flex items-center gap-3 sm:gap-4 group">
                             <Link to={`/product/${prodId}`} className="relative flex-shrink-0">
                               <img
                                 src={itemImg}
                                 alt={item.name}
-                                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform"
+                                className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl object-cover bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform"
                               />
                             </Link>
 
                             <div className="flex-1 min-w-0">
                               <Link
                                 to={`/product/${prodId}`}
-                                className="text-sm font-bold text-slate-900 hover:text-pink-600 line-clamp-1 block font-heading transition-colors"
+                                className="text-xs sm:text-sm font-bold text-slate-900 hover:text-pink-600 line-clamp-1 block font-heading transition-colors"
                               >
                                 {item.name}
                               </Link>
-                              <div className="flex flex-wrap items-center gap-2 mt-1">
+                              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mt-1">
                                 {item.product?.brand && (
                                   <span className="px-2 py-0.5 rounded-md bg-pink-50 text-pink-700 font-extrabold text-[10px]">
                                     {item.product.brand}
                                   </span>
                                 )}
-                                <span className="text-xs text-slate-500 font-medium">
-                                  Quantity: <strong className="text-slate-800">{item.quantity}</strong>
+                                <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
+                                  Qty: <strong className="text-slate-800">{item.quantity}</strong>
                                 </span>
                                 <span className="text-xs text-slate-400">•</span>
-                                <span className="text-xs text-slate-500 font-medium">
-                                  Price: <strong className="text-slate-800">₹{item.price.toLocaleString('en-IN')}</strong> each
+                                <span className="text-[11px] sm:text-xs text-slate-500 font-medium">
+                                  ₹{item.price.toLocaleString('en-IN')}
                                 </span>
                               </div>
                             </div>
 
                             <div className="text-right flex-shrink-0">
-                              <span className="text-sm font-black text-slate-900 font-heading block">
+                              <span className="text-xs sm:text-sm font-black text-slate-900 font-heading block">
                                 ₹{(item.price * item.quantity).toLocaleString('en-IN')}
                               </span>
                               <Link

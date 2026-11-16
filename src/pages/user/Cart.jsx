@@ -173,12 +173,12 @@ const Cart = () => {
             return (
               <div
                 key={prod._id}
-                className="flex flex-col sm:flex-row items-center gap-4 p-4 rounded-3xl bg-white border border-slate-100 shadow-xs hover:shadow-md transition-shadow"
+                className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-2xl sm:rounded-3xl bg-white border border-slate-100 shadow-xs hover:shadow-md transition-shadow"
               >
                 {/* Image */}
                 <Link
                   to={`/product/${prod._id}`}
-                  className="w-24 h-24 rounded-2xl overflow-hidden bg-slate-50 flex-shrink-0"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-50 flex-shrink-0"
                 >
                   <img
                     src={prod.productImages?.[0] || 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=300&q=80'}
@@ -188,21 +188,21 @@ const Cart = () => {
                 </Link>
 
                 {/* Details */}
-                <div className="flex-1 min-w-0 text-center sm:text-left space-y-1">
+                <div className="flex-1 min-w-0 text-left space-y-0.5 sm:space-y-1">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-pink-600">
                     {prod.brand}
                   </span>
                   <Link
                     to={`/product/${prod._id}`}
-                    className="block text-sm font-bold text-slate-800 hover:text-pink-600 truncate font-heading"
+                    className="block text-xs sm:text-sm font-bold text-slate-800 hover:text-pink-600 truncate font-heading"
                   >
                     {prod.name}
                   </Link>
-                  <p className="text-xs text-slate-400">Age: {prod.ageGroup}</p>
-                  <div className="text-sm font-black text-slate-900 font-heading">
+                  <p className="text-[11px] sm:text-xs text-slate-400">Age: {prod.ageGroup}</p>
+                  <div className="text-xs sm:text-sm font-black text-slate-900 font-heading">
                     ₹{price.toLocaleString('en-IN')}
                     {prod.discountPrice > 0 && (
-                      <span className="text-xs text-slate-400 line-through ml-2 font-normal">
+                      <span className="text-[10px] sm:text-xs text-slate-400 line-through ml-1.5 font-normal">
                         ₹{prod.price.toLocaleString('en-IN')}
                       </span>
                     )}

@@ -79,7 +79,7 @@ const Wishlist = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
         {wishlist.map((product) => {
           if (!product) return null;
           const originalPrice = product.price;
@@ -88,15 +88,15 @@ const Wishlist = () => {
           return (
             <div
               key={product._id}
-              className="bg-white rounded-3xl border border-slate-100 shadow-xs hover:shadow-md transition-shadow overflow-hidden flex flex-col p-4 relative"
+              className="bg-white rounded-2xl sm:rounded-3xl border border-slate-100 shadow-xs hover:shadow-md transition-shadow overflow-hidden flex flex-col p-2.5 sm:p-4 relative"
             >
               {/* Remove button */}
               <button
                 onClick={() => toggleWishlist(product)}
-                className="absolute top-6 right-6 z-10 p-2 rounded-full bg-white/80 hover:bg-rose-50 text-slate-400 hover:text-rose-500 shadow-xs transition-colors"
+                className="absolute top-3 right-3 sm:top-6 sm:right-6 z-10 p-1.5 sm:p-2 rounded-full bg-white/80 hover:bg-rose-50 text-slate-400 hover:text-rose-500 shadow-xs transition-colors"
                 title="Remove from wishlist"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
 
               {/* Image */}
@@ -129,12 +129,12 @@ const Wishlist = () => {
                   <p className="text-xs text-slate-400">Age: {product.ageGroup}</p>
                 </div>
 
-                <div className="flex items-baseline gap-2">
-                  <span className="text-lg font-black text-slate-900 font-heading">
+                <div className="flex items-baseline gap-1.5 sm:gap-2 flex-wrap">
+                  <span className="text-sm sm:text-lg font-black text-slate-900 font-heading">
                     ₹{currentPrice.toLocaleString('en-IN')}
                   </span>
                   {product.discountPrice > 0 && (
-                    <span className="text-xs text-slate-400 line-through">
+                    <span className="text-[10px] sm:text-xs text-slate-400 line-through">
                       ₹{originalPrice.toLocaleString('en-IN')}
                     </span>
                   )}

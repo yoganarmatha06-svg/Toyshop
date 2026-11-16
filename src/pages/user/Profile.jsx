@@ -189,9 +189,9 @@ const Profile = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+    <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-10">
       <div>
-        <h1 className="text-3xl font-black text-slate-900 font-heading">
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
           Profile & Account Settings ⚙️
         </h1>
         <p className="text-xs text-slate-500 font-medium">
@@ -199,9 +199,9 @@ const Profile = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-start">
         {/* Profile Details Form */}
-        <div className="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xs space-y-6">
+        <div className="lg:col-span-6 bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-xs space-y-5 sm:space-y-6">
           <h2 className="text-lg font-black text-slate-900 font-heading border-b pb-4 flex items-center gap-2">
             <UserIcon className="w-5 h-5 text-pink-500" /> Personal Information
           </h2>
@@ -412,7 +412,7 @@ const Profile = () => {
         </div>
 
         {/* Address Book */}
-        <div className="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xs space-y-6">
+        <div className="lg:col-span-6 bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-xs space-y-5 sm:space-y-6">
           <div className="flex items-center justify-between border-b pb-4">
             <h2 className="text-lg font-black text-slate-900 font-heading flex items-center gap-2">
               <MapPin className="w-5 h-5 text-pink-500" /> Saved Addresses ({addresses.length})
@@ -420,7 +420,7 @@ const Profile = () => {
 
             <button
               onClick={() => setShowAddressModal(true)}
-              className="text-xs font-bold text-pink-600 hover:text-pink-700 flex items-center gap-1"
+              className="text-xs font-bold text-pink-600 hover:text-pink-700 min-h-[44px] flex items-center gap-1 px-2"
             >
               <Plus className="w-4 h-4" /> Add Address
             </button>
@@ -433,7 +433,7 @@ const Profile = () => {
               <p>No addresses saved yet.</p>
               <button
                 onClick={() => setShowAddressModal(true)}
-                className="px-4 py-2 bg-pink-100 text-pink-700 rounded-full font-bold text-xs"
+                className="px-4 py-2.5 bg-pink-100 text-pink-700 rounded-full font-bold text-xs min-h-[44px]"
               >
                 Add Your Delivery Address
               </button>
@@ -449,7 +449,7 @@ const Profile = () => {
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start justify-between gap-2">
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-slate-900">{addr.fullName}</span>
@@ -459,7 +459,7 @@ const Profile = () => {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-600 mt-1">
+                      <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                         {addr.streetAddress}, {addr.city}, {addr.state} - {addr.postalCode}
                       </p>
                       <p className="text-[11px] text-slate-500 mt-1 font-semibold">
@@ -467,21 +467,22 @@ const Profile = () => {
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
                       {!addr.isDefault && (
                         <button
                           onClick={() => handleSetDefaultAddress(addr._id)}
-                          className="text-[11px] font-bold text-pink-600 hover:underline"
+                          className="text-[11px] font-bold text-pink-600 hover:underline min-h-[44px] px-2 flex items-center"
                         >
                           Make Default
                         </button>
                       )}
                       <button
                         onClick={() => handleDeleteAddress(addr._id)}
-                        className="text-slate-400 hover:text-rose-500 p-1"
+                        className="text-slate-400 hover:text-rose-500 p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
                         title="Delete address"
+                        aria-label="Delete address"
                       >
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -492,18 +493,18 @@ const Profile = () => {
 
           {/* Add Address Form Modal */}
           {showAddressModal && (
-            <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+            <div className="p-4 sm:p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
               <h3 className="text-xs font-black text-slate-900 font-heading uppercase tracking-wider">
                 New Address
               </h3>
               <form onSubmit={handleCreateAddress} className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
                     type="text"
                     placeholder="Full name"
                     value={newAddr.fullName}
                     onChange={(e) => setNewAddr({ ...newAddr, fullName: e.target.value })}
-                    className="w-full p-2 text-xs bg-white border border-slate-200 rounded-xl"
+                    className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl min-h-[44px]"
                     required
                   />
                   <input
@@ -511,7 +512,7 @@ const Profile = () => {
                     placeholder="Phone"
                     value={newAddr.phoneNumber}
                     onChange={(e) => setNewAddr({ ...newAddr, phoneNumber: e.target.value })}
-                    className="w-full p-2 text-xs bg-white border border-slate-200 rounded-xl"
+                    className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl min-h-[44px]"
                     required
                   />
                 </div>
@@ -520,16 +521,16 @@ const Profile = () => {
                   placeholder="Street address, house no..."
                   value={newAddr.streetAddress}
                   onChange={(e) => setNewAddr({ ...newAddr, streetAddress: e.target.value })}
-                  className="w-full p-2 text-xs bg-white border border-slate-200 rounded-xl"
+                  className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl min-h-[44px]"
                   required
                 />
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <input
                     type="text"
                     placeholder="City"
                     value={newAddr.city}
                     onChange={(e) => setNewAddr({ ...newAddr, city: e.target.value })}
-                    className="w-full p-2 text-xs bg-white border border-slate-200 rounded-xl"
+                    className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl min-h-[44px]"
                     required
                   />
                   <input
@@ -537,7 +538,7 @@ const Profile = () => {
                     placeholder="State"
                     value={newAddr.state}
                     onChange={(e) => setNewAddr({ ...newAddr, state: e.target.value })}
-                    className="w-full p-2 text-xs bg-white border border-slate-200 rounded-xl"
+                    className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl min-h-[44px]"
                     required
                   />
                   <input
@@ -545,21 +546,21 @@ const Profile = () => {
                     placeholder="PIN Code"
                     value={newAddr.postalCode}
                     onChange={(e) => setNewAddr({ ...newAddr, postalCode: e.target.value })}
-                    className="w-full p-2 text-xs bg-white border border-slate-200 rounded-xl"
+                    className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl min-h-[44px]"
                     required
                   />
                 </div>
                 <div className="flex gap-2 pt-1">
                   <button
                     type="submit"
-                    className="px-5 py-2 bg-pink-500 text-white rounded-full text-xs font-bold"
+                    className="px-5 py-2.5 bg-pink-500 text-white rounded-full text-xs font-bold min-h-[44px]"
                   >
                     Save Address
                   </button>
                   <button
                     type="button"
                     onClick={() => setShowAddressModal(false)}
-                    className="px-3 py-2 text-xs text-slate-500 font-bold"
+                    className="px-4 py-2.5 text-xs text-slate-500 font-bold min-h-[44px]"
                   >
                     Cancel
                   </button>

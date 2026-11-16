@@ -167,7 +167,7 @@ const Home = () => {
                 <img
                   src={banner.src}
                   alt={banner.alt}
-                  className="w-full h-[180px] xs:h-[220px] sm:h-[320px] md:h-[400px] lg:h-[480px] xl:h-[540px] object-cover object-center block select-none"
+                  className="w-full aspect-[2.67/1] object-contain sm:object-cover object-center block select-none bg-gradient-to-r from-pink-50/50 via-purple-50/50 to-pink-50/50"
                 />
               </Link>
             </div>
@@ -181,9 +181,9 @@ const Home = () => {
             prevBanner();
           }}
           aria-label="Previous Banner"
-          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/85 hover:bg-white text-slate-800 hover:text-pink-600 shadow-md hover:shadow-xl backdrop-blur-xs flex items-center justify-center transition-all duration-200 active:scale-90 group/arrow focus:outline-none opacity-90 hover:opacity-100 cursor-pointer"
+          className="absolute left-1.5 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-11 sm:h-11 rounded-full bg-white/85 hover:bg-white text-slate-800 hover:text-pink-600 shadow-md hover:shadow-xl backdrop-blur-xs flex items-center justify-center transition-all duration-200 active:scale-90 group/arrow focus:outline-none opacity-90 hover:opacity-100 cursor-pointer"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover/arrow:-translate-x-0.5" />
+          <ChevronLeft className="w-3.5 h-3.5 sm:w-6 sm:h-6 transition-transform group-hover/arrow:-translate-x-0.5" />
         </button>
 
         {/* Right Side Arrow Button */}
@@ -193,21 +193,21 @@ const Home = () => {
             nextBanner();
           }}
           aria-label="Next Banner"
-          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-white/85 hover:bg-white text-slate-800 hover:text-pink-600 shadow-md hover:shadow-xl backdrop-blur-xs flex items-center justify-center transition-all duration-200 active:scale-90 group/arrow focus:outline-none opacity-90 hover:opacity-100 cursor-pointer"
+          className="absolute right-1.5 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 sm:w-11 sm:h-11 rounded-full bg-white/85 hover:bg-white text-slate-800 hover:text-pink-600 shadow-md hover:shadow-xl backdrop-blur-xs flex items-center justify-center transition-all duration-200 active:scale-90 group/arrow focus:outline-none opacity-90 hover:opacity-100 cursor-pointer"
         >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover/arrow:translate-x-0.5" />
+          <ChevronRight className="w-3.5 h-3.5 sm:w-6 sm:h-6 transition-transform group-hover/arrow:translate-x-0.5" />
         </button>
 
         {/* Bottom Pagination Dots */}
-        <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 bg-slate-900/30 backdrop-blur-xs px-3 py-1.5 rounded-full">
+        <div className="absolute bottom-1.5 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 sm:gap-2 bg-slate-900/35 backdrop-blur-xs px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-full">
           {heroBanners.map((banner, idx) => (
             <button
               key={banner.id}
               onClick={() => setCurrentBanner(idx)}
-              className={`h-2 rounded-full transition-all duration-200 cursor-pointer ${
+              className={`h-1.5 sm:h-2 rounded-full transition-all duration-200 cursor-pointer ${
                 currentBanner === idx
-                  ? 'w-6 bg-pink-500 shadow-xs'
-                  : 'w-2 bg-white/70 hover:bg-white'
+                  ? 'w-4 sm:w-6 bg-pink-500 shadow-xs'
+                  : 'w-1.5 sm:w-2 bg-white/70 hover:bg-white'
               }`}
               aria-label={`Go to banner ${idx + 1}`}
             />
@@ -216,63 +216,63 @@ const Home = () => {
       </motion.section>
 
       {/* Quick Highlights / Trust Bar - Scroll Stagger */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.2 }}
           variants={containerStagger}
-          className="grid grid-cols-2 md:grid-cols-4 gap-4"
+          className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4"
         >
           <motion.div
             variants={itemFadeUp}
-            className="flex items-center gap-3.5 p-4 bg-pink-50/80 border border-pink-100 rounded-2xl shadow-xs hover:shadow-md transition-shadow"
+            className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-2 sm:gap-3.5 p-3 sm:p-4 bg-pink-50/80 border border-pink-100 rounded-2xl shadow-xs hover:shadow-md transition-shadow"
           >
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-              <Truck className="w-6 h-6" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Truck className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h4 className="text-sm font-extrabold text-slate-900 font-heading">Free Delivery</h4>
-              <p className="text-xs text-slate-500 font-medium">On orders over ₹999</p>
+              <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 font-heading">Free Delivery</h4>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-medium">On orders over ₹999</p>
             </div>
           </motion.div>
 
           <motion.div
             variants={itemFadeUp}
-            className="flex items-center gap-3.5 p-4 bg-emerald-50/80 border border-emerald-100 rounded-2xl shadow-xs hover:shadow-md transition-shadow"
+            className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-2 sm:gap-3.5 p-3 sm:p-4 bg-emerald-50/80 border border-emerald-100 rounded-2xl shadow-xs hover:shadow-md transition-shadow"
           >
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-              <ShieldCheck className="w-6 h-6" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h4 className="text-sm font-extrabold text-slate-900 font-heading">100% Certified Safe</h4>
-              <p className="text-xs text-slate-500 font-medium">Child-friendly & non-toxic</p>
+              <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 font-heading">100% Certified Safe</h4>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-medium">Child-friendly & non-toxic</p>
             </div>
           </motion.div>
 
           <motion.div
             variants={itemFadeUp}
-            className="flex items-center gap-3.5 p-4 bg-amber-50/80 border border-amber-100 rounded-2xl shadow-xs hover:shadow-md transition-shadow"
+            className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-2 sm:gap-3.5 p-3 sm:p-4 bg-amber-50/80 border border-amber-100 rounded-2xl shadow-xs hover:shadow-md transition-shadow"
           >
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-              <Gift className="w-6 h-6" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Gift className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <h4 className="text-sm font-extrabold text-slate-900 font-heading">10 Toy Categories</h4>
-              <p className="text-xs text-slate-500 font-medium">Teddy, RC cars, blocks & more</p>
+              <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 font-heading">10 Toy Categories</h4>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-medium">Teddy, RC cars & more</p>
             </div>
           </motion.div>
 
           <motion.div
             variants={itemFadeUp}
-            className="flex items-center gap-3.5 p-4 bg-purple-50/80 border border-purple-100 rounded-2xl shadow-xs hover:shadow-md transition-shadow"
+            className="flex flex-col sm:flex-row items-center sm:items-center text-center sm:text-left gap-2 sm:gap-3.5 p-3 sm:p-4 bg-purple-50/80 border border-purple-100 rounded-2xl shadow-xs hover:shadow-md transition-shadow"
           >
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 text-white flex items-center justify-center shrink-0 shadow-sm">
-              <Star className="w-6 h-6 fill-current" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+              <Star className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
             </div>
             <div>
-              <h4 className="text-sm font-extrabold text-slate-900 font-heading">4.9 / 5 Rating</h4>
-              <p className="text-xs text-slate-500 font-medium">Loved by 10,000+ kids & parents</p>
+              <h4 className="text-xs sm:text-sm font-extrabold text-slate-900 font-heading">4.9 / 5 Rating</h4>
+              <p className="text-[10px] sm:text-xs text-slate-500 font-medium">Loved by 10,000+ kids</p>
             </div>
           </motion.div>
         </motion.div>
@@ -284,10 +284,10 @@ const Home = () => {
         whileInView={{ opacity: 1 }}
         viewport={{ once: false, amount: 0.15 }}
         transition={{ duration: 0.5 }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative"
+        className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative"
       >
-        {/* Floating Pink Teddy Bear at Left Corner */}
-        <div className="absolute -top-10 sm:-top-14 md:-top-16 left-1 sm:left-4 lg:-left-6 z-20 pointer-events-auto">
+        {/* Floating Pink Teddy Bear at Left Corner - Hidden on small mobile to avoid overflow */}
+        <div className="hidden sm:block absolute -top-10 sm:-top-14 md:-top-16 left-1 sm:left-4 lg:-left-6 z-20 pointer-events-none">
           <FloatingToy
             src={teddyBearImg}
             alt="Explore Categories Pink Teddy Bear"
@@ -302,8 +302,8 @@ const Home = () => {
           />
         </div>
 
-        {/* Floating 3D Toy (t2) at Right Side Corner (Lower Down) */}
-        <div className="absolute top-4 sm:top-6 md:top-8 -right-2 sm:right-2 lg:-right-6 z-20 pointer-events-auto">
+        {/* Floating 3D Toy (t2) at Right Side Corner - Hidden on small mobile */}
+        <div className="hidden sm:block absolute top-4 sm:top-6 md:top-8 -right-2 sm:right-2 lg:-right-6 z-20 pointer-events-none">
           <FloatingToy
             src={t2Img}
             alt="Explore Categories 3D Teddy Bear"
@@ -428,7 +428,7 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {featuredProducts.slice(0, 12).map((product) => (
               <div key={product._id} className="h-full">
                 <ProductCard product={product} isFeaturedSection={true} />
@@ -474,7 +474,7 @@ const Home = () => {
             whileInView="visible"
             viewport={{ once: true, amount: 0.1 }}
             variants={containerStagger}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
+            className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"
           >
             {bestSellers.slice(0, 8).map((product) => (
               <motion.div key={product._id} variants={itemFadeUp}>
@@ -579,7 +579,7 @@ const Home = () => {
             whileTap={{ scale: 0.92 }}
             onClick={scrollToTop}
             aria-label="Scroll to top"
-            className="fixed bottom-6 right-6 z-40 p-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-xl shadow-pink-300/50 hover:shadow-2xl hover:shadow-pink-300/70 border-2 border-white flex items-center justify-center cursor-pointer transition-shadow group"
+            className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-40 p-3 sm:p-3.5 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-xl shadow-pink-300/50 hover:shadow-2xl hover:shadow-pink-300/70 border-2 border-white flex items-center justify-center cursor-pointer transition-shadow group"
           >
             <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
           </motion.button>

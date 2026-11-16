@@ -293,9 +293,9 @@ const Checkout = () => {
   const total = subtotal - couponDiscount + shippingFee + tax;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8">
       <div>
-        <h1 className="text-3xl font-black text-slate-900 font-heading">
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
           Checkout & Delivery 🚚
         </h1>
         <p className="text-xs text-slate-500 font-medium">
@@ -303,11 +303,11 @@ const Checkout = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-start">
         {/* Left Section: Address & Payment */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-6 sm:space-y-8">
           {/* Section 1: Delivery Address */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xs space-y-6">
+          <div className="bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-xs space-y-5 sm:space-y-6">
             <div className="flex items-center justify-between border-b pb-4">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-sm">
@@ -322,7 +322,7 @@ const Checkout = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddressForm(true)}
-                  className="text-xs font-bold text-pink-600 hover:text-pink-700 flex items-center gap-1"
+                  className="text-xs font-bold text-pink-600 hover:text-pink-700 min-h-[44px] flex items-center gap-1 px-2"
                 >
                   <Plus className="w-4 h-4" /> Add New Address
                 </button>
@@ -368,7 +368,7 @@ const Checkout = () => {
 
             {/* New Address Form */}
             {showAddressForm && (
-              <form onSubmit={handleCreateAddress} className="space-y-4 bg-slate-50 p-5 rounded-2xl border border-slate-200/80">
+              <form onSubmit={handleCreateAddress} className="space-y-4 bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80">
                 <h3 className="text-xs font-black text-slate-900 font-heading uppercase tracking-wider">
                   Enter Shipping Details
                 </h3>
@@ -381,7 +381,7 @@ const Checkout = () => {
                       value={newAddress.fullName}
                       onChange={(e) => setNewAddress({ ...newAddress, fullName: e.target.value })}
                       placeholder="Receiver's name"
-                      className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400 min-h-[44px]"
                       required
                     />
                   </div>
@@ -392,7 +392,7 @@ const Checkout = () => {
                       value={newAddress.phoneNumber}
                       onChange={(e) => setNewAddress({ ...newAddress, phoneNumber: e.target.value })}
                       placeholder="+91 9876543210"
-                      className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400 min-h-[44px]"
                       required
                     />
                   </div>
@@ -405,7 +405,7 @@ const Checkout = () => {
                     value={newAddress.streetAddress}
                     onChange={(e) => setNewAddress({ ...newAddress, streetAddress: e.target.value })}
                     placeholder="Apartment, building, street, area..."
-                    className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400"
+                    className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400 min-h-[44px]"
                     required
                   />
                 </div>
@@ -418,7 +418,7 @@ const Checkout = () => {
                       value={newAddress.city}
                       onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
                       placeholder="e.g. Mumbai"
-                      className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400 min-h-[44px]"
                       required
                     />
                   </div>
@@ -429,7 +429,7 @@ const Checkout = () => {
                       value={newAddress.state}
                       onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
                       placeholder="e.g. Maharashtra"
-                      className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400 min-h-[44px]"
                       required
                     />
                   </div>
@@ -440,7 +440,7 @@ const Checkout = () => {
                       value={newAddress.postalCode}
                       onChange={(e) => setNewAddress({ ...newAddress, postalCode: e.target.value })}
                       placeholder="e.g. 400001"
-                      className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400 min-h-[44px]"
                       required
                     />
                   </div>
@@ -449,7 +449,7 @@ const Checkout = () => {
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     type="submit"
-                    className="px-6 py-2.5 bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs rounded-full shadow-sm"
+                    className="px-6 py-2.5 bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs rounded-full shadow-sm min-h-[44px]"
                   >
                     Save & Deliver Here
                   </button>
@@ -457,7 +457,7 @@ const Checkout = () => {
                     <button
                       type="button"
                       onClick={() => setShowAddressForm(false)}
-                      className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700"
+                      className="px-4 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-700 min-h-[44px]"
                     >
                       Cancel
                     </button>
@@ -468,7 +468,7 @@ const Checkout = () => {
           </div>
 
           {/* Section 2: Payment Method */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-100 shadow-xs space-y-6">
+          <div className="bg-white rounded-3xl p-4 sm:p-8 border border-slate-100 shadow-xs space-y-5 sm:space-y-6">
             <div className="flex items-center gap-2.5 border-b pb-4">
               <div className="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-sm">
                 2
@@ -543,7 +543,7 @@ const Checkout = () => {
 
         {/* Right Section: Order Review & Confirmation CTA */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm space-y-6 sticky top-28">
+          <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-100 shadow-sm space-y-5 sm:space-y-6 sticky top-28">
             <h3 className="text-base font-black text-slate-900 font-heading border-b pb-4">
               Order Review ({totalItems} items)
             </h3>

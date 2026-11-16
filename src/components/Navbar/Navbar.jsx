@@ -10,6 +10,7 @@ import {
   PackageCheck,
   LayoutDashboard,
   LogOut,
+  Home as HomeIcon,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -77,14 +78,14 @@ const Navbar = () => {
       {/* Top Subtle Shimmer Highlight Ribbon */}
       <div className="h-0.5 bg-gradient-to-r from-white/30 via-white/80 to-white/30 w-full" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-3 sm:gap-6">
           {/* Brand Logo */}
           <Link to="/" className="flex items-center flex-shrink-0 group py-1">
             <img
               src={toyLogo}
               alt="Toy World - Play Learn Grow"
-              className="h-14 sm:h-16 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300 select-none"
+              className="h-11 sm:h-16 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300 select-none"
             />
           </Link>
 
@@ -250,90 +251,204 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Drawer Navigation with matching gradient */}
+      {/* Directly Visible Mobile Navigation Bar for "Home", "Shop All Toys", "Best Sellers" */}
+      <div className="md:hidden flex items-center gap-2 px-3 py-2 border-t border-white/20 bg-white/10 backdrop-blur-md overflow-x-auto scrollbar-none">
+        {navLinks.map((link) => (
+          <NavLink
+            key={link.name}
+            to={link.path}
+            className={({ isActive }) =>
+              `text-xs font-bold px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all duration-200 flex-shrink-0 flex items-center gap-1.5 shadow-2xs ${
+                isActive
+                  ? 'bg-white text-[#A855F7] font-black shadow-sm scale-102'
+                  : 'text-white/95 bg-white/20 hover:bg-white/30'
+              }`
+            }
+          >
+            {link.name === 'Home' && '🏠'}
+            {link.name === 'Shop All Toys' && '🧸'}
+            {link.name === 'Best Sellers' && '⭐'}
+            <span>{link.name}</span>
+          </NavLink>
+        ))}
+      </div>
+
+      {/* Mobile Drawer Navigation: Smooth slide-in mobile menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-gradient-to-b from-[#FF6B9A] to-[#A855F7] border-t border-white/20 px-6 py-6 shadow-xl space-y-4"
-          >
-            <div className="flex flex-col space-y-3 font-heading font-semibold text-base">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.name}
-                  to={link.path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `py-2.5 px-3 rounded-xl font-nav text-lg font-bold transition-colors ${
-                      isActive ? 'bg-white text-[#A855F7] shadow-sm' : 'text-white/90 hover:bg-white/15'
-                    }`
-                  }
-                >
-                  {link.name}
-                </NavLink>
-              ))}
-              <NavLink
-                to="/wishlist"
-                onClick={() => setMobileMenuOpen(false)}
-                className="py-2.5 px-3 rounded-xl text-white/90 hover:bg-white/15 transition-colors flex items-center justify-between"
-              >
-                <span>My Wishlist</span>
-                <span className="px-2 py-0.5 bg-yellow-400 text-slate-900 rounded-full text-xs font-bold">
-                  {wishlist.length}
-                </span>
-              </NavLink>
-              {isAuthenticated && (
-                <>
-                  <NavLink
-                    to="/my-orders"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="py-2.5 px-3 rounded-xl text-white/90 hover:bg-white/15 transition-colors flex items-center gap-2"
-                  >
-                    <PackageCheck className="w-4 h-4" />
-                    <span>My Orders</span>
-                  </NavLink>
-                  <NavLink
-                    to="/profile"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="py-2.5 px-3 rounded-xl text-white/90 hover:bg-white/15 transition-colors flex items-center gap-2"
-                  >
-                    <UserIcon className="w-4 h-4" />
-                    <span>My Profile</span>
-                  </NavLink>
-                </>
-              )}
-              {isAdmin && (
-                <NavLink
-                  to="/admin/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="py-2.5 px-3 rounded-xl text-yellow-300 font-bold flex items-center gap-2 hover:bg-white/15"
-                >
-                  <LayoutDashboard className="w-4 h-4" /> Admin Portal
-                </NavLink>
-              )}
-            </div>
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 md:hidden"
+            />
 
-            {!isAuthenticated && (
-              <div className="pt-4 border-t border-white/20 flex flex-col gap-2">
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-2.5 text-center text-sm font-bold text-white border border-white/30 rounded-full bg-white/15 hover:bg-white/25"
-                >
-                  Log In
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full py-2.5 text-center text-sm font-extrabold text-[#A855F7] bg-white rounded-full shadow-md"
-                >
-                  Create Account
-                </Link>
+            {/* Smooth Slide-In Mobile Drawer */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 260 }}
+              className="fixed top-0 right-0 bottom-0 w-[82%] max-w-[320px] bg-gradient-to-b from-[#FF6B9A] via-[#A855F7] to-[#8B5CF6] z-50 p-5 shadow-2xl flex flex-col justify-between overflow-y-auto md:hidden text-white"
+            >
+              <div className="space-y-5">
+                {/* Drawer Header with Logo & Close Button */}
+                <div className="flex items-center justify-between pb-3 border-b border-white/20">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={toyLogo}
+                      alt="Toy World"
+                      className="h-10 w-auto object-contain drop-shadow-sm select-none"
+                    />
+                  </div>
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    aria-label="Close menu"
+                    className="p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-white/20 transition-colors cursor-pointer"
+                  >
+                    <X className="w-6 h-6 text-white" />
+                  </button>
+                </div>
+
+                {/* User Card if Authenticated */}
+                {isAuthenticated && (
+                  <div className="bg-white/15 p-3 rounded-2xl flex items-center gap-3 border border-white/25">
+                    {user?.avatar && user.avatar.trim() !== '' && !user.avatar.includes('photo-1534528741775-53994a69daeb') ? (
+                      <img
+                        src={user.avatar}
+                        alt={user?.name}
+                        className="w-10 h-10 rounded-full object-cover ring-2 ring-white/70"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-white/25 text-white font-bold flex items-center justify-center text-sm">
+                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                      </div>
+                    )}
+                    <div className="truncate flex-1">
+                      <p className="text-sm font-bold text-white truncate">{user?.name}</p>
+                      <p className="text-[11px] text-white/80 truncate">{user?.email}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Nav Links */}
+                <div className="flex flex-col space-y-1.5 font-heading">
+                  {navLinks.map((link) => (
+                    <NavLink
+                      key={link.name}
+                      to={link.path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={({ isActive }) =>
+                        `min-h-[44px] flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-base font-bold transition-all ${
+                          isActive
+                            ? 'bg-white text-[#A855F7] shadow-sm font-black'
+                            : 'text-white/95 hover:bg-white/15'
+                        }`
+                      }
+                    >
+                      {link.name === 'Home' && <HomeIcon className="w-5 h-5" />}
+                      {link.name === 'Shop All Toys' && <ShoppingBag className="w-5 h-5" />}
+                      {link.name === 'Best Sellers' && <PackageCheck className="w-5 h-5" />}
+                      <span>{link.name}</span>
+                    </NavLink>
+                  ))}
+
+                  <NavLink
+                    to="/wishlist"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="min-h-[44px] py-2.5 px-3.5 rounded-xl text-white/95 hover:bg-white/15 transition-colors flex items-center justify-between text-base font-bold"
+                  >
+                    <span className="flex items-center gap-3">
+                      <Heart className="w-5 h-5" /> My Wishlist
+                    </span>
+                    <span className="px-2 py-0.5 bg-yellow-400 text-slate-900 rounded-full text-xs font-bold">
+                      {wishlist.length}
+                    </span>
+                  </NavLink>
+
+                  <NavLink
+                    to="/cart"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="min-h-[44px] py-2.5 px-3.5 rounded-xl text-white/95 hover:bg-white/15 transition-colors flex items-center justify-between text-base font-bold"
+                  >
+                    <span className="flex items-center gap-3">
+                      <ShoppingBag className="w-5 h-5" /> Shopping Cart
+                    </span>
+                    <span className="px-2 py-0.5 bg-white text-[#A855F7] rounded-full text-xs font-black">
+                      {totalItems}
+                    </span>
+                  </NavLink>
+
+                  {isAuthenticated && (
+                    <>
+                      <NavLink
+                        to="/my-orders"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="min-h-[44px] py-2.5 px-3.5 rounded-xl text-white/95 hover:bg-white/15 transition-colors flex items-center gap-3 text-base font-bold"
+                      >
+                        <PackageCheck className="w-5 h-5" />
+                        <span>My Orders</span>
+                      </NavLink>
+                      <NavLink
+                        to="/profile"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="min-h-[44px] py-2.5 px-3.5 rounded-xl text-white/95 hover:bg-white/15 transition-colors flex items-center gap-3 text-base font-bold"
+                      >
+                        <UserIcon className="w-5 h-5" />
+                        <span>Profile & Addresses</span>
+                      </NavLink>
+                    </>
+                  )}
+
+                  {isAdmin && (
+                    <NavLink
+                      to="/admin/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="min-h-[44px] py-2.5 px-3.5 rounded-xl text-yellow-300 font-bold flex items-center gap-3 hover:bg-white/15 text-base"
+                    >
+                      <LayoutDashboard className="w-5 h-5" /> Admin Portal
+                    </NavLink>
+                  )}
+                </div>
               </div>
-            )}
-          </motion.div>
+
+              {/* Drawer Bottom Actions */}
+              <div className="pt-4 border-t border-white/20 mt-6 space-y-2">
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="w-full min-h-[44px] py-2.5 px-4 rounded-full bg-white/20 hover:bg-white/30 text-white font-bold text-sm transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4" /> Sign Out
+                  </button>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      to="/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full min-h-[44px] py-2.5 text-center text-sm font-bold text-white border border-white/40 rounded-full bg-white/15 hover:bg-white/25 flex items-center justify-center"
+                    >
+                      Log In
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="w-full min-h-[44px] py-2.5 text-center text-sm font-extrabold text-[#A855F7] bg-white rounded-full shadow-md flex items-center justify-center"
+                    >
+                      Create Account
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </header>

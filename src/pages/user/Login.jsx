@@ -46,16 +46,16 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-white rounded-3xl p-8 sm:p-10 border border-slate-100 shadow-xl space-y-6">
+    <div className="min-h-[80vh] flex items-center justify-center px-3 sm:px-4 py-8 sm:py-12">
+      <div className="max-w-md w-full bg-white rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-10 border border-slate-100 shadow-xl space-y-5 sm:space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <img
             src={toyLogo}
             alt="Toy World"
-            className="h-16 w-auto mx-auto object-contain drop-shadow-sm select-none"
+            className="h-14 sm:h-16 w-auto mx-auto object-contain drop-shadow-sm select-none"
           />
-          <h1 className="text-2xl font-black text-slate-900 font-heading">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 font-heading">
             Welcome to Toy World
           </h1>
           <p className="text-xs text-slate-500 font-medium">
@@ -67,7 +67,7 @@ const Login = () => {
         <button
           type="button"
           onClick={handleFillDemoUser}
-          className="w-full py-2.5 px-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold hover:bg-amber-100 transition-colors flex items-center justify-center gap-1.5"
+          className="w-full min-h-[44px] py-2.5 px-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold hover:bg-amber-100 transition-colors flex items-center justify-center gap-1.5"
         >
           <KeyRound className="w-3.5 h-3.5 text-amber-600" />
           <span>One-Click Demo Customer Login</span>
@@ -84,7 +84,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="user@toystore.com"
-                className="w-full pl-10 pr-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
+                className="w-full min-h-[44px] pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
                 required
               />
             </div>
@@ -99,7 +99,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-3 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
+                className="w-full min-h-[44px] pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
                 required
               />
             </div>
@@ -108,7 +108,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-extrabold text-xs shadow-lg shadow-pink-200 active:scale-95 transition-all flex items-center justify-center gap-2"
+            className="w-full min-h-[44px] py-3.5 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-extrabold text-xs shadow-lg shadow-pink-200 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <span>{loading ? 'Signing In...' : 'Sign In to Your Account'}</span>
             <ArrowRight className="w-4 h-4" />

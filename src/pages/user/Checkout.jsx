@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   MapPin,
   CreditCard,
@@ -8,6 +8,7 @@ import {
   Plus,
   ArrowRight,
   Truck,
+  Tag,
 } from 'lucide-react';
 import api from '../../services/api';
 import { useCart } from '../../context/CartContext';
@@ -20,6 +21,13 @@ const Checkout = () => {
   const { user } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Coupon discount is active ONLY when purchase subtotal is above ₹2,000
+  const couponDiscount =
+    subtotal > 2000 && location.state?.discountAmount ? location.state.discountAmount : 0;
+  const couponPromoCode =
+    subtotal > 2000 && location.state?.promoCode ? location.state.promoCode : '';
 
   const [addresses, setAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState('');
@@ -51,6 +59,29 @@ const Checkout = () => {
           const defaultAddr = data.find((a) => a.isDefault) || data[0];
           setSelectedAddressId(defaultAddr._id);
         } else {
+          // If no address in Address collection, check if user provided customerDetails during Add to Cart
+          try {
+            const savedDetails = localStorage.getItem('customerDetails');
+            const parsed = savedDetails ? JSON.parse(savedDetails) : null;
+            if (parsed?.address) {
+              const { data: newAddr } = await api.post('/users/addresses', {
+                fullName: parsed.name || user?.name || 'Customer',
+                phoneNumber: parsed.phone || user?.phone || '9876543210',
+                streetAddress: parsed.address,
+                city: parsed.city || 'Chennai',
+                state: parsed.state || 'Tamil Nadu',
+                postalCode: parsed.postalCode || '600001',
+                country: 'India',
+                isDefault: true,
+              });
+              setAddresses([newAddr]);
+              setSelectedAddressId(newAddr._id);
+              setShowAddressForm(false);
+              return;
+            }
+          } catch (e) {
+            // ignore
+          }
           setShowAddressForm(true);
         }
       } catch (err) {
@@ -89,7 +120,7 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
-    const selectedAddress = addresses.find((a) => a._id === selectedAddressId);
+    let selectedAddress = addresses.find((a) => a._id === selectedAddressId) || addresses[0];
     if (!selectedAddress) {
       addToast('Please select or add a delivery address', 'error');
       return;
@@ -105,16 +136,20 @@ const Checkout = () => {
     setProcessingOrder(true);
 
     try {
-      // 1. Prepare order payload
-      const orderItems = items.map((item) => ({
-        product: item.product._id,
+      // 1. Prepare clean, verified order payload
+      const validItems = items.filter((item) => item.product);
+      const orderItems = validItems.map((item) => ({
+        product: item.product?._id || item.product,
+        name: item.product?.name,
+        image: item.product?.productImages?.[0],
+        price: item.product?.discountPrice > 0 ? item.product.discountPrice : item.product?.price,
         quantity: item.quantity,
       }));
 
-      // Shipping & Tax estimation
+      // Shipping & Tax estimation (factoring in coupon discount if subtotal > 2000)
       const shippingPrice = subtotal >= 999 ? 0 : 99;
-      const taxPrice = Math.round(subtotal * 0.05);
-      const calculatedTotal = subtotal + shippingPrice + taxPrice;
+      const taxPrice = Math.round((subtotal - couponDiscount) * 0.05);
+      const calculatedTotal = subtotal - couponDiscount + shippingPrice + taxPrice;
 
       if (paymentMethod === 'COD') {
         // Direct COD Order
@@ -135,16 +170,38 @@ const Checkout = () => {
           amount: calculatedTotal,
         });
 
-        // Fetch Razorpay key
+        // If in simulation/test mode without live merchant keys:
+        if (razorpayOrder.isSimulation) {
+          const mockPaymentId = `pay_sim_${Date.now()}`;
+          const { data: confirmedOrder } = await api.post('/orders', {
+            orderItems,
+            shippingAddress: selectedAddress,
+            paymentMethod: 'Razorpay',
+            isPaid: true,
+            paymentResult: {
+              id: mockPaymentId,
+              status: 'SUCCESS',
+              razorpay_order_id: razorpayOrder.id,
+              razorpay_payment_id: mockPaymentId,
+            },
+          });
+
+          addToast('Payment successful & Order placed! 🚀', 'success');
+          fetchCart();
+          navigate(`/my-orders?confirmed=${confirmedOrder._id}`);
+          return;
+        }
+
+        // Live Razorpay mode
         const { data: keyData } = await api.get('/payment/key');
 
         const options = {
           key: keyData.key,
           amount: razorpayOrder.amount,
           currency: 'INR',
-          name: 'ToyVerse Store',
+          name: 'Toy World Store',
           description: `Order of ${totalItems} Toys`,
-          image: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?auto=format&fit=crop&w=120&q=80',
+          image: '/logo.png',
           order_id: razorpayOrder.isSimulation ? undefined : razorpayOrder.id,
           handler: async function (response) {
             try {
@@ -232,8 +289,8 @@ const Checkout = () => {
 
   const items = cart?.items || [];
   const shippingFee = subtotal >= 999 ? 0 : 99;
-  const tax = Math.round(subtotal * 0.05);
-  const total = subtotal + shippingFee + tax;
+  const tax = Math.round((subtotal - couponDiscount) * 0.05);
+  const total = subtotal - couponDiscount + shippingFee + tax;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
@@ -523,6 +580,15 @@ const Checkout = () => {
                 <span>Subtotal</span>
                 <span className="font-bold text-slate-900">₹{subtotal.toLocaleString('en-IN')}</span>
               </div>
+              {couponDiscount > 0 && (
+                <div className="flex justify-between text-emerald-600 font-bold">
+                  <span className="flex items-center gap-1">
+                    <Tag className="w-3 h-3 text-emerald-600" />
+                    Coupon Discount ({couponPromoCode || 'TOYJOY'})
+                  </span>
+                  <span>- ₹{couponDiscount.toLocaleString('en-IN')}</span>
+                </div>
+              )}
               <div className="flex justify-between text-slate-600">
                 <span>Delivery</span>
                 <span className="font-bold">

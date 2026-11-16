@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, Truck, RefreshCw, HeartHandshake, Phone, Mail, MapPin } from 'lucide-react';
+import toyLogo from '../../assets/logo.png';
 
 const Footer = () => {
   return (
@@ -53,11 +54,12 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-10 py-12">
           {/* Brand Col */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center gap-2.5 group">
-              <span className="text-3xl">🧸</span>
-              <span className="font-logo text-3xl font-black text-white group-hover:text-pink-400 transition-colors">
-                Toy<span className="text-pink-400 group-hover:text-amber-400 transition-colors ml-1">World</span>
-              </span>
+            <Link to="/" className="inline-block group">
+              <img
+                src={toyLogo}
+                alt="Toy World - Play Learn Grow"
+                className="h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md select-none"
+              />
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
               Bringing boundless joy, imagination, and educational discovery to childhood with India's premier collection of authentic toys, puzzles, and interactive play.

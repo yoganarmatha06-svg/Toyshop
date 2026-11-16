@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Lock, Mail, User, Phone, ArrowRight } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import toyLogo from '../../assets/logo.png';
 
 const Register = () => {
   const { register } = useAuth();
@@ -44,11 +45,13 @@ const Register = () => {
       <div className="max-w-md w-full bg-white rounded-3xl p-8 sm:p-10 border border-slate-100 shadow-xl space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-500 to-amber-400 mx-auto flex items-center justify-center text-3xl shadow-md shadow-pink-200">
-            🧸
-          </div>
+          <img
+            src={toyLogo}
+            alt="Toy World"
+            className="h-16 w-auto mx-auto object-contain drop-shadow-sm select-none"
+          />
           <h1 className="text-2xl font-black text-slate-900 font-heading">
-            Join the ToyVerse Family
+            Join the Toy World Family
           </h1>
           <p className="text-xs text-slate-500 font-medium">
             Create an account to track shipments, rate toys, and receive surprise birthday offers

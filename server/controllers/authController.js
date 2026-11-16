@@ -42,21 +42,58 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Authenticate user & get token
+// @desc    Authenticate user & get token (Auto-processes & stores new users in MongoDB)
 // @route   POST /api/auth/login
 // @access  Public
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name, phone } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ message: 'Please provide email and password' });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const normalizedEmail = email.toLowerCase().trim();
+    let user = await User.findOne({ email: normalizedEmail });
 
-    if (user && (await user.matchPassword(password))) {
-      res.json({
+    // If new user logs in, process in backend and store in MongoDB database!
+    if (!user) {
+      if (password.length < 6) {
+        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+      }
+
+      // Generate a user-friendly name from email if not provided (e.g. "priya.sharma@gmail.com" -> "Priya Sharma")
+      const derivedName =
+        name?.trim() ||
+        normalizedEmail
+          .split('@')[0]
+          .replace(/[._-]+/g, ' ')
+          .replace(/\b\w/g, (c) => c.toUpperCase());
+
+      user = await User.create({
+        name: derivedName || 'Toy World Customer',
+        email: normalizedEmail,
+        password, // pre('save') hook will hash with bcrypt
+        phone: phone?.trim() || '',
+        role: 'user',
+      });
+
+      return res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone,
+        avatar: user.avatar,
+        token: generateToken(user._id),
+        isNewUser: true,
+        message: 'Account created and logged in successfully!',
+      });
+    }
+
+    // Existing user: check password
+    if (await user.matchPassword(password)) {
+      return res.json({
         _id: user._id,
         name: user.name,
         email: user.email,
@@ -66,7 +103,7 @@ export const loginUser = async (req, res) => {
         token: generateToken(user._id),
       });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'Invalid password. Please check and try again.' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message || 'Server error' });
@@ -146,7 +183,9 @@ export const updateUserProfile = async (req, res) => {
     if (user) {
       user.name = req.body.name || user.name;
       user.phone = req.body.phone !== undefined ? req.body.phone : user.phone;
-      user.avatar = req.body.avatar || user.avatar;
+      if (req.body.avatar !== undefined) {
+        user.avatar = req.body.avatar;
+      }
 
       if (req.body.email && req.body.email !== user.email) {
         const emailExists = await User.findOne({ email: req.body.email.toLowerCase() });
@@ -176,6 +215,43 @@ export const updateUserProfile = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: error.message || 'Server error' });
+  }
+};
+
+// @desc    Upload user avatar from local disk
+// @route   POST /api/auth/upload-avatar
+// @access  Private
+export const uploadAvatar = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No photo selected. Please choose a photo from your local disk.' });
+    }
+
+    const avatarUrl = `/uploads/${req.file.filename}`;
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.avatar = avatarUrl;
+      const updatedUser = await user.save();
+
+      return res.json({
+        message: 'Profile photo uploaded from disk and saved successfully! ✨',
+        avatar: avatarUrl,
+        user: {
+          _id: updatedUser._id,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          role: updatedUser.role,
+          phone: updatedUser.phone,
+          avatar: updatedUser.avatar,
+          token: generateToken(updatedUser._id),
+        },
+      });
+    } else {
+      return res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message || 'Error uploading photo from local disk' });
   }
 };
 

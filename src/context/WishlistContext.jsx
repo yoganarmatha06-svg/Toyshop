@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
@@ -8,6 +9,9 @@ const WishlistContext = createContext(null);
 export const WishlistProvider = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const { addToast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [wishlist, setWishlist] = useState([]);
   const [wishlistIds, setWishlistIds] = useState(new Set());
   const [loading, setLoading] = useState(false);
@@ -36,12 +40,14 @@ export const WishlistProvider = ({ children }) => {
   }, [fetchWishlist]);
 
   const toggleWishlist = async (product) => {
+    // If user is not logged in, show login page to user
     if (!isAuthenticated) {
-      addToast('Please log in to save items to your wishlist!', 'info');
+      addToast('Please log in to add items to your wishlist! 💖', 'info');
+      navigate('/login', { state: { from: location } });
       return false;
     }
 
-    const pId = product._id || product;
+    const pId = typeof product === 'object' ? product._id : product;
     const isCurrentlyIn = wishlistIds.has(pId);
 
     try {

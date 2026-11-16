@@ -229,9 +229,11 @@ const ProductCardInner = ({
         <span className="truncate max-w-[130px] font-bold text-pink-700">
           {product.category?.name || product.brand}
         </span>
-        <span className="px-2 py-0.5 bg-slate-100 text-slate-800 rounded-md font-bold text-[11px]">
-          {product.ageGroup}
-        </span>
+        {product.ageGroup && (
+          <span className="px-2 py-0.5 bg-slate-100 text-slate-800 rounded-md font-bold text-[11px]">
+            {product.ageGroup}
+          </span>
+        )}
       </div>
 
       {/* Product Title */}

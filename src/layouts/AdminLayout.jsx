@@ -16,6 +16,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import toyLogo from '../assets/logo.png';
 
 const AdminLayout = () => {
   const { user, logout } = useAuth();
@@ -40,21 +41,20 @@ const AdminLayout = () => {
   return (
     <div className="min-h-screen bg-slate-100/70 flex flex-col md:flex-row">
       {/* Mobile Header */}
-      <div className="md:hidden bg-slate-900 text-white px-4 py-3.5 flex items-center justify-between sticky top-0 z-50 border-b border-slate-800">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 via-rose-500 to-pink-500 flex items-center justify-center text-lg shadow-md">
-            🧸
-          </div>
-          <span className="font-logo font-black text-2xl tracking-normal text-white inline-flex items-center">
-            Toy<span className="text-pink-400 ml-1">World</span>
-          </span>
+      <div className="md:hidden bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-50 border-b border-slate-800">
+        <Link to="/admin/dashboard" className="flex items-center gap-2">
+          <img
+            src={toyLogo}
+            alt="Toy World Admin"
+            className="h-10 w-auto object-contain select-none"
+          />
           <span className="text-[10px] font-bold font-heading text-amber-400 uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700">
             Admin
           </span>
-        </div>
+        </Link>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-lg bg-slate-800 text-slate-200"
+          className="p-2 rounded-lg bg-slate-800 text-slate-200 cursor-pointer"
           aria-label="Toggle admin menu"
         >
           {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -68,23 +68,20 @@ const AdminLayout = () => {
         }`}
       >
         {/* Brand */}
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between">
-          <Link to="/admin/dashboard" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-400 via-rose-500 to-pink-500 flex items-center justify-center text-2xl shadow-lg shadow-pink-500/20 group-hover:scale-105 group-hover:rotate-6 transition-transform">
-              🧸
-            </div>
-            <div className="flex flex-col">
-              <span className="font-logo text-2xl sm:text-[26px] font-black text-white tracking-normal leading-none group-hover:text-pink-400 transition-colors inline-flex items-center">
-                Toy<span className="text-pink-400 group-hover:text-amber-400 transition-colors ml-1">World</span>
-              </span>
-              <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1 font-heading mt-1">
-                <Shield className="w-2.5 h-2.5" /> Admin Control
-              </span>
-            </div>
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between relative">
+          <Link to="/admin/dashboard" className="flex flex-col items-center mx-auto group">
+            <img
+              src={toyLogo}
+              alt="Toy World Admin"
+              className="h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md select-none"
+            />
+            <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1 font-heading mt-1 bg-slate-800/90 px-2.5 py-0.5 rounded-md border border-slate-700">
+              <Shield className="w-2.5 h-2.5 text-amber-400" /> Admin Control
+            </span>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="md:hidden text-slate-400 hover:text-white"
+            className="md:hidden text-slate-400 hover:text-white absolute top-4 right-4"
           >
             <X className="w-5 h-5" />
           </button>

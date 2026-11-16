@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShoppingBag,
@@ -10,20 +10,61 @@ import {
   PackageCheck,
   LayoutDashboard,
   LogOut,
-  ChevronDown,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { useWishlist } from '../../context/WishlistContext';
+import toyLogo from '../../assets/logo.png';
 
 const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { totalItems } = useCart();
   const { wishlist } = useWishlist();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileRef = useRef(null);
+
+  // Automatically close profile dropdown & mobile menu when navigating to another page
+  useEffect(() => {
+    setProfileDropdownOpen(false);
+    setMobileMenuOpen(false);
+  }, [location.pathname, location.search]);
+
+  // Immediately close profile dropdown when scrolling down the page or clicking outside
+  useEffect(() => {
+    if (!profileDropdownOpen) return;
+
+    const handleScroll = () => {
+      setProfileDropdownOpen(false);
+    };
+
+    const handleClickOutside = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setProfileDropdownOpen(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [profileDropdownOpen]);
 
   const navLinks = [
     { name: 'Home', path: '/' },
@@ -38,24 +79,13 @@ const Navbar = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20 gap-6">
-          {/* Logo matching gradient style */}
-          <Link to="/" className="flex items-center gap-3 flex-shrink-0 group">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-2xl shadow-md shadow-purple-950/20 group-hover:scale-105 group-hover:rotate-6 transition-transform">
-              🧸
-            </div>
-            <div className="flex flex-col">
-              <span className="font-logo text-3xl sm:text-[32px] lg:text-[34px] font-black tracking-normal leading-none inline-flex items-center drop-shadow-xs">
-                <span className="text-white group-hover:text-pink-100 transition-colors">Toy</span>
-                <span className="text-yellow-300 group-hover:text-yellow-200 transition-colors ml-1.5">World</span>
-              </span>
-              <span className="hidden sm:block text-[10px] font-extrabold tracking-[0.22em] uppercase font-heading mt-0.5 text-white/90">
-                <span>Play</span>{' '}
-                <span className="text-yellow-300">•</span>{' '}
-                <span>Learn</span>{' '}
-                <span className="text-yellow-300">•</span>{' '}
-                <span>Grow</span>
-              </span>
-            </div>
+          {/* Brand Logo */}
+          <Link to="/" className="flex items-center flex-shrink-0 group py-1">
+            <img
+              src={toyLogo}
+              alt="Toy World - Play Learn Grow"
+              className="h-14 sm:h-16 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300 select-none"
+            />
           </Link>
 
           {/* Desktop Nav Links Pill Container */}
@@ -108,20 +138,21 @@ const Navbar = () => {
 
             {/* User Dropdown / Login */}
             {isAuthenticated ? (
-              <div className="relative">
+              <div className="relative" ref={profileRef}>
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-full bg-white/15 border border-white/25 hover:bg-white/25 transition-colors cursor-pointer text-white"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 border border-white/25 hover:bg-white/25 transition-all cursor-pointer text-white shadow-2xs hover:scale-105 active:scale-95"
                 >
-                  <img
-                    src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                    alt={user?.name}
-                    className="w-7 h-7 rounded-full object-cover ring-2 ring-white/60"
-                  />
-                  <span className="hidden md:block text-xs font-bold text-white max-w-[90px] truncate">
+                  {user?.avatar && user.avatar.trim() !== '' && !user.avatar.includes('photo-1534528741775-53994a69daeb') && (
+                    <img
+                      src={user.avatar}
+                      alt={user?.name}
+                      className="w-7 h-7 rounded-full object-cover ring-2 ring-white/70 flex-shrink-0"
+                    />
+                  )}
+                  <span className="text-xs sm:text-sm font-bold text-white max-w-[120px] truncate">
                     {user?.name?.split(' ')[0]}
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-white/80 hidden sm:block" />
                 </button>
 
                 <AnimatePresence>
@@ -134,14 +165,27 @@ const Navbar = () => {
                       onClick={() => setProfileDropdownOpen(false)}
                       className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden"
                     >
-                      <div className="px-4 py-2 border-b border-slate-100">
-                        <p className="text-sm font-bold text-slate-800 truncate">{user?.name}</p>
-                        <p className="text-xs text-slate-400 truncate">{user?.email}</p>
-                        {isAdmin && (
-                          <span className="mt-1 inline-block px-2 py-0.5 bg-amber-100 text-amber-800 font-bold text-[10px] rounded-md uppercase">
-                            Admin Account
-                          </span>
+                      <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-3">
+                        {user?.avatar && user.avatar.trim() !== '' && !user.avatar.includes('photo-1534528741775-53994a69daeb') ? (
+                          <img
+                            src={user.avatar}
+                            alt={user?.name}
+                            className="w-10 h-10 rounded-full object-cover ring-2 ring-pink-400 flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold flex items-center justify-center flex-shrink-0 shadow-xs text-sm">
+                            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                          </div>
                         )}
+                        <div className="truncate flex-1">
+                          <p className="text-sm font-bold text-slate-800 truncate">{user?.name}</p>
+                          <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+                          {isAdmin && (
+                            <span className="mt-1 inline-block px-2 py-0.5 bg-amber-100 text-amber-800 font-bold text-[10px] rounded-md uppercase">
+                              Admin Account
+                            </span>
+                          )}
+                        </div>
                       </div>
 
                       {isAdmin && (
@@ -240,6 +284,26 @@ const Navbar = () => {
                   {wishlist.length}
                 </span>
               </NavLink>
+              {isAuthenticated && (
+                <>
+                  <NavLink
+                    to="/my-orders"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-2.5 px-3 rounded-xl text-white/90 hover:bg-white/15 transition-colors flex items-center gap-2"
+                  >
+                    <PackageCheck className="w-4 h-4" />
+                    <span>My Orders</span>
+                  </NavLink>
+                  <NavLink
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="py-2.5 px-3 rounded-xl text-white/90 hover:bg-white/15 transition-colors flex items-center gap-2"
+                  >
+                    <UserIcon className="w-4 h-4" />
+                    <span>My Profile</span>
+                  </NavLink>
+                </>
+              )}
               {isAdmin && (
                 <NavLink
                   to="/admin/dashboard"

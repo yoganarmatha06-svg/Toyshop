@@ -38,7 +38,9 @@ export const toggleWishlistItem = async (req, res) => {
       wishlist = new Wishlist({ user: req.user._id, products: [] });
     }
 
-    const index = wishlist.products.indexOf(productId);
+    const index = wishlist.products.findIndex(
+      (id) => (id._id || id).toString() === productId.toString()
+    );
     let added = false;
 
     if (index > -1) {
@@ -47,6 +49,11 @@ export const toggleWishlistItem = async (req, res) => {
       wishlist.products.push(productId);
       added = true;
     }
+
+    // Deduplicate
+    wishlist.products = Array.from(
+      new Set(wishlist.products.map((id) => (id._id || id).toString()))
+    );
 
     await wishlist.save();
 
@@ -78,7 +85,7 @@ export const removeFromWishlist = async (req, res) => {
     }
 
     wishlist.products = wishlist.products.filter(
-      (id) => id.toString() !== productId
+      (id) => (id._id || id).toString() !== productId.toString()
     );
     await wishlist.save();
 

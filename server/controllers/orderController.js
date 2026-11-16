@@ -22,10 +22,11 @@ export const createOrder = async (req, res) => {
     let calculatedItemsPrice = 0;
 
     for (const item of orderItems) {
-      const dbProduct = await Product.findById(item.product);
+      const productId = item.product?._id || item.product;
+      const dbProduct = await Product.findById(productId);
 
       if (!dbProduct) {
-        return res.status(404).json({ message: `Product not found: ${item.name || item.product}` });
+        return res.status(404).json({ message: `Product not found: ${item.name || productId}` });
       }
 
       if (dbProduct.stockQuantity < item.quantity) {
@@ -38,15 +39,18 @@ export const createOrder = async (req, res) => {
       const verifiedPrice =
         dbProduct.discountPrice > 0 ? dbProduct.discountPrice : dbProduct.price;
 
+      const fallbackImg =
+        'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80';
+
       verifiedOrderItems.push({
         product: dbProduct._id,
         name: dbProduct.name,
-        image: dbProduct.productImages[0] || item.image,
+        image: (dbProduct.productImages && dbProduct.productImages[0]) || item.image || fallbackImg,
         price: verifiedPrice,
-        quantity: item.quantity,
+        quantity: Number(item.quantity) || 1,
       });
 
-      calculatedItemsPrice += verifiedPrice * item.quantity;
+      calculatedItemsPrice += verifiedPrice * (Number(item.quantity) || 1);
     }
 
     // Shipping & Tax calculation
@@ -67,11 +71,21 @@ export const createOrder = async (req, res) => {
       }
     }
 
+    const formattedShippingAddress = {
+      fullName: shippingAddress.fullName || req.user?.name || 'Customer',
+      phoneNumber: shippingAddress.phoneNumber || req.user?.phone || '9876543210',
+      streetAddress: shippingAddress.streetAddress || 'Delivery Address',
+      city: shippingAddress.city || 'Chennai',
+      state: shippingAddress.state || 'Tamil Nadu',
+      postalCode: shippingAddress.postalCode || '600001',
+      country: shippingAddress.country || 'India',
+    };
+
     const order = new Order({
       user: req.user._id,
       orderItems: verifiedOrderItems,
-      shippingAddress,
-      paymentMethod: paymentMethod || 'Razorpay',
+      shippingAddress: formattedShippingAddress,
+      paymentMethod: paymentMethod || 'COD',
       paymentResult: paymentResult || {},
       itemsPrice: calculatedItemsPrice,
       shippingPrice,
@@ -122,7 +136,9 @@ export const getOrderById = async (req, res) => {
 // @access  Private
 export const getMyOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
+    const orders = await Order.find({ user: req.user._id })
+      .populate('orderItems.product', 'name productImages brand price discountPrice availabilityStatus category')
+      .sort({ createdAt: -1 });
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message || 'Server error' });

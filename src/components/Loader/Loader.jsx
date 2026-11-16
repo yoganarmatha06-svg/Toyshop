@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const Loader = ({ fullScreen = false, text = 'Loading ToyVerse wonders...' }) => {
+const Loader = ({ fullScreen = false, text = 'Loading Toy World wonders...' }) => {
   const content = (
     <div className="flex flex-col items-center justify-center gap-4">
       <div className="flex items-center gap-2">

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Lock, Mail, ArrowRight, KeyRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import toyLogo from '../../assets/logo.png';
 
 const AdminLogin = () => {
   const { adminLogin } = useAuth();
@@ -36,13 +37,15 @@ const AdminLogin = () => {
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 py-12">
       <div className="max-w-md w-full bg-slate-800 rounded-3xl p-8 sm:p-10 border border-slate-700 shadow-2xl space-y-6">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 via-rose-500 to-pink-500 mx-auto flex items-center justify-center text-3xl shadow-lg shadow-pink-500/20">
-            🧸
+        <div className="text-center space-y-3">
+          <img
+            src={toyLogo}
+            alt="Toy World Admin"
+            className="h-20 w-auto mx-auto object-contain drop-shadow-xl select-none"
+          />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-400 text-xs font-bold font-heading">
+            <Shield className="w-3.5 h-3.5" /> Admin Control Portal
           </div>
-          <h1 className="font-logo text-3xl sm:text-4xl font-black text-white tracking-normal inline-flex items-center justify-center">
-            Toy<span className="text-pink-400 ml-1">World</span> <span className="text-xl sm:text-2xl font-bold font-heading text-amber-400 ml-2">Admin</span>
-          </h1>
           <p className="text-xs text-slate-400 font-medium">
             Restricted store management, stock monitoring, and orders panel
           </p>

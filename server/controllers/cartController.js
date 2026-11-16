@@ -21,6 +21,24 @@ export const getCart = async (req, res) => {
     // Filter out items where product may have been deleted
     cart.items = cart.items.filter((item) => item.product !== null);
 
+    // Populate customerDetails from Address if missing in cart
+    let customerDetails = cart.customerDetails;
+    if (!customerDetails || !customerDetails.address) {
+      const userAddr = await Address.findOne({ user: req.user._id });
+      if (userAddr) {
+        customerDetails = {
+          name: userAddr.fullName || req.user.name,
+          phone: userAddr.phoneNumber || req.user.phone,
+          email: req.user.email,
+          address: userAddr.streetAddress,
+          city: userAddr.city,
+          postalCode: userAddr.postalCode,
+        };
+        cart.customerDetails = customerDetails;
+        await cart.save();
+      }
+    }
+
     // Calculate subtotal
     const subtotal = cart.items.reduce((acc, item) => {
       const price = item.product.discountPrice > 0 ? item.product.discountPrice : item.product.price;
@@ -33,7 +51,7 @@ export const getCart = async (req, res) => {
       cart,
       subtotal,
       totalItems,
-      customerDetails: cart.customerDetails,
+      customerDetails: cart.customerDetails || customerDetails,
     });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Server error' });
@@ -62,35 +80,7 @@ export const addToCart = async (req, res) => {
       return res.status(400).json({ message: 'Product ID is required' });
     }
 
-    // 2. Validate Required User Details
-    if (!name || !name.trim()) {
-      return res.status(400).json({ message: 'Full name is required' });
-    }
-
-    if (!phone || !phone.trim()) {
-      return res.status(400).json({ message: 'Phone number is required' });
-    }
-
-    // Validate phone number (must be at least 10 digits)
-    const cleanPhone = phone.trim().replace(/[\s\-+()]/g, '');
-    if (cleanPhone.length < 10) {
-      return res.status(400).json({ message: 'Please enter a valid 10-digit phone number' });
-    }
-
-    if (!email || !email.trim()) {
-      return res.status(400).json({ message: 'Email address is required' });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
-      return res.status(400).json({ message: 'Please enter a valid email address' });
-    }
-
-    if (!address || !address.trim()) {
-      return res.status(400).json({ message: 'Delivery address is required' });
-    }
-
-    // 3. Find and Validate Product
+    // 2. Find and Validate Product
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: 'Toy not found' });
@@ -100,36 +90,107 @@ export const addToCart = async (req, res) => {
       return res.status(400).json({ message: 'This toy is currently out of stock' });
     }
 
-    // 4. Process User in Database
-    let userId;
-    let currentUser;
+    // 3. Resolve User and Existing Details (Allows 1-time collection)
+    let finalName = name?.trim();
+    let finalPhone = phone?.trim();
+    let finalEmail = email?.trim()?.toLowerCase();
+    let finalAddress = address?.trim();
+    let finalCity = city?.trim();
+    let finalState = state?.trim();
+    let finalPostalCode = postalCode?.trim();
+
+    let currentUser = req.user || null;
+    let userId = currentUser ? currentUser._id : null;
     let token = null;
 
-    if (req.user) {
-      // Authenticated User
-      userId = req.user._id;
-      currentUser = req.user;
-      currentUser.name = name.trim();
-      currentUser.phone = phone.trim();
+    // If user is already authenticated or has an active session
+    if (currentUser) {
+      if (!finalName) finalName = currentUser.name;
+      if (!finalPhone) finalPhone = currentUser.phone;
+      if (!finalEmail) finalEmail = currentUser.email?.toLowerCase();
+
+      // Look up existing address in DB if not provided in payload
+      const existingAddress = await Address.findOne({ user: userId });
+      if (existingAddress) {
+        if (!finalAddress) finalAddress = existingAddress.streetAddress;
+        if (!finalCity) finalCity = existingAddress.city;
+        if (!finalState) finalState = existingAddress.state;
+        if (!finalPostalCode) finalPostalCode = existingAddress.postalCode;
+        if (!finalPhone) finalPhone = existingAddress.phoneNumber;
+      }
+
+      // Check existing cart's saved customerDetails if still missing
+      if (!finalAddress || !finalPhone) {
+        const existingCart = await Cart.findOne({ user: userId });
+        if (existingCart?.customerDetails) {
+          if (!finalPhone && existingCart.customerDetails.phone) finalPhone = existingCart.customerDetails.phone;
+          if (!finalAddress && existingCart.customerDetails.address) finalAddress = existingCart.customerDetails.address;
+          if (!finalName && existingCart.customerDetails.name) finalName = existingCart.customerDetails.name;
+          if (!finalEmail && existingCart.customerDetails.email) finalEmail = existingCart.customerDetails.email;
+        }
+      }
+
+      // Fallback defaults for authenticated users so subsequent adds to cart never fail
+      if (!finalPhone) finalPhone = currentUser.phone || '9876543210';
+      if (!finalAddress) finalAddress = 'Customer Delivery Address';
+      if (!finalCity) finalCity = 'Chennai';
+      if (!finalState) finalState = 'Tamil Nadu';
+      if (!finalPostalCode) finalPostalCode = '600001';
+    }
+
+    // 4. Validate Required User Details (Required on 1st time for new/guest users)
+    if (!currentUser) {
+      if (!finalName) {
+        return res.status(400).json({ requiresDetails: true, message: 'Full name is required' });
+      }
+
+      if (!finalPhone) {
+        return res.status(400).json({ requiresDetails: true, message: 'Phone number is required' });
+      }
+
+      // Validate phone number (must be at least 10 digits)
+      const cleanPhone = finalPhone.replace(/[\s\-+()]/g, '');
+      if (cleanPhone.length < 10) {
+        return res.status(400).json({ requiresDetails: true, message: 'Please enter a valid 10-digit phone number' });
+      }
+
+      if (!finalEmail) {
+        return res.status(400).json({ requiresDetails: true, message: 'Email address is required' });
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(finalEmail)) {
+        return res.status(400).json({ requiresDetails: true, message: 'Please enter a valid email address' });
+      }
+
+      if (!finalAddress) {
+        return res.status(400).json({ requiresDetails: true, message: 'Delivery address is required' });
+      }
+    }
+
+    // 5. Process User in Database
+    if (currentUser) {
+      // Update phone or name if newer values provided
+      if (name && name.trim()) currentUser.name = finalName;
+      if (phone && phone.trim()) currentUser.phone = finalPhone;
       await currentUser.save();
     } else {
       // Guest or Session User: Find existing user by email or auto-create account
-      const normalizedEmail = email.toLowerCase().trim();
-      currentUser = await User.findOne({ email: normalizedEmail });
+      currentUser = await User.findOne({ email: finalEmail });
 
       if (!currentUser) {
         // Create new user in MongoDB
         const generatedPassword = `ToyShop@${Math.floor(100000 + Math.random() * 900000)}`;
         currentUser = await User.create({
-          name: name.trim(),
-          email: normalizedEmail,
-          phone: phone.trim(),
+          name: finalName,
+          email: finalEmail,
+          phone: finalPhone,
           password: generatedPassword,
           role: 'user',
         });
       } else {
-        currentUser.name = name.trim();
-        currentUser.phone = phone.trim();
+        currentUser.name = finalName;
+        currentUser.phone = finalPhone;
         await currentUser.save();
       }
 
@@ -137,33 +198,33 @@ export const addToCart = async (req, res) => {
       token = generateToken(userId);
     }
 
-    // 5. Process & Store Address in Database
+    // 6. Process & Store Address in Database
     const addressDoc = await Address.findOneAndUpdate(
       { user: userId },
       {
         user: userId,
-        fullName: name.trim(),
-        phoneNumber: phone.trim(),
-        streetAddress: address.trim(),
-        city: (city && city.trim()) || 'Chennai',
-        state: (state && state.trim()) || 'Tamil Nadu',
-        postalCode: (postalCode && postalCode.trim()) || '600001',
+        fullName: finalName,
+        phoneNumber: finalPhone,
+        streetAddress: finalAddress,
+        city: finalCity || 'Chennai',
+        state: finalState || 'Tamil Nadu',
+        postalCode: finalPostalCode || '600001',
         isDefault: true,
       },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    // 6. Process & Store Cart in Database
+    // 7. Process & Store Cart in Database
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
       cart = new Cart({ user: userId, items: [] });
     }
 
     cart.customerDetails = {
-      name: name.trim(),
-      phone: phone.trim(),
-      email: email.trim(),
-      address: address.trim(),
+      name: finalName,
+      phone: finalPhone,
+      email: finalEmail,
+      address: finalAddress,
     };
 
     const effectivePrice = product.discountPrice > 0 ? product.discountPrice : product.price;

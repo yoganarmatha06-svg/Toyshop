@@ -30,10 +30,13 @@ import ManageCategories from './pages/admin/ManageCategories';
 import ManageOrders from './pages/admin/ManageOrders';
 import ManageUsers from './pages/admin/ManageUsers';
 import SalesReports from './pages/admin/SalesReports';
+import ScrollToTop from './components/ScrollToTop/ScrollToTop';
 
 function App() {
   return (
-    <Routes>
+    <>
+      <ScrollToTop />
+      <Routes>
       {/* Public & Customer Routes */}
       <Route element={<UserLayout />}>
         <Route path="/" element={<Home />} />
@@ -99,6 +102,7 @@ function App() {
       {/* Fallback 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+  </>
   );
 }
 

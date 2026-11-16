@@ -7,13 +7,23 @@ import AddToCartModal from '../components/AddToCartModal/AddToCartModal';
 const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
-  const { isAuthenticated, setAuthData } = useAuth();
+  const { user, isAuthenticated, setAuthData } = useAuth();
   const { addToast } = useToast();
   const [cart, setCart] = useState({ items: [] });
   const [subtotal, setSubtotal] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
+
+  // Cached customer details to ensure details are collected only 1 time
+  const [customerDetails, setCustomerDetails] = useState(() => {
+    try {
+      const saved = localStorage.getItem('customerDetails');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
 
   // Modal State for collecting required user details (Name, Phone, Email, Address)
   const [modalState, setModalState] = useState({
@@ -28,6 +38,9 @@ export const CartProvider = ({ children }) => {
       setCart({ items: [] });
       setSubtotal(0);
       setTotalItems(0);
+      if (!localStorage.getItem('token') && !localStorage.getItem('customerDetails')) {
+        setCustomerDetails(null);
+      }
       return;
     }
     try {
@@ -36,6 +49,13 @@ export const CartProvider = ({ children }) => {
       setCart(data.cart || { items: [] });
       setSubtotal(data.subtotal || 0);
       setTotalItems(data.totalItems || 0);
+
+      if (data.customerDetails?.name && data.customerDetails?.address) {
+        setCustomerDetails((prev) => prev || data.customerDetails);
+        if (!localStorage.getItem('customerDetails')) {
+          localStorage.setItem('customerDetails', JSON.stringify(data.customerDetails));
+        }
+      }
     } catch (err) {
       console.error('Failed to fetch cart:', err.message);
     } finally {
@@ -48,10 +68,42 @@ export const CartProvider = ({ children }) => {
   }, [fetchCart]);
 
   /**
-   * Called whenever user clicks "Add to Cart".
-   * Opens the Customer Details Modal to collect required details: Name, Phone, Email, Address.
+   * Helper to check whether customer details (Name, Phone, Delivery Address)
+   * have already been collected for this user/session.
    */
-  const addToCart = (productOrId, quantity = 1) => {
+  const getSavedCustomerDetails = () => {
+    // 1. From context state
+    if (customerDetails?.name && customerDetails?.address) {
+      return customerDetails;
+    }
+
+    // 2. From localStorage
+    try {
+      const saved = localStorage.getItem('customerDetails');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed?.name && parsed?.address) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    // 3. From cart customerDetails (MongoDB)
+    if (cart?.customerDetails?.name && cart?.customerDetails?.address) {
+      return cart.customerDetails;
+    }
+
+    return null;
+  };
+
+  /**
+   * Called whenever user clicks "Add to Cart".
+   * For a NEW user (1st time): customer details (Name, Phone, Email, Delivery Address) are collected via modal.
+   * For the SAME user (2nd time onwards): details are NOT asked again and toy is added directly!
+   */
+  const addToCart = async (productOrId, quantity = 1) => {
     let productObj = null;
     let prodId = null;
 
@@ -67,7 +119,46 @@ export const CartProvider = ({ children }) => {
       return;
     }
 
-    // Open the details modal
+    // Check if user details have ALREADY been collected:
+    const existingDetails = getSavedCustomerDetails();
+
+    // 2nd time onwards: If details ALREADY exist, DO NOT open the modal! Add directly!
+    if (existingDetails) {
+      try {
+        setLoading(true);
+        const payload = {
+          productId: prodId,
+          quantity,
+          ...existingDetails,
+        };
+
+        const { data } = await api.post('/cart', payload);
+
+        setCart(data.cart);
+        setSubtotal(data.subtotal);
+        setTotalItems(data.totalItems);
+
+        if (data.customerDetails) {
+          setCustomerDetails(data.customerDetails);
+          localStorage.setItem('customerDetails', JSON.stringify(data.customerDetails));
+        }
+
+        if (data.token && data.user && setAuthData && !isAuthenticated) {
+          setAuthData(data.user, data.token);
+        }
+
+        addToast('Toy added to your cart successfully! 🛍️', 'success');
+        return true;
+      } catch (err) {
+        console.error('Direct add to cart failed:', err);
+        addToast(err.message || 'Failed to add item to cart', 'error');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // 1st time only: Open details modal to collect Name, Phone, Email, Address
     setModalState({
       isOpen: true,
       product: productObj,
@@ -84,7 +175,7 @@ export const CartProvider = ({ children }) => {
   };
 
   /**
-   * Process & Submit Add to Cart with User Details to Backend & MongoDB Database
+   * Process & Submit Add to Cart with User Details to Backend & MongoDB Database (1st time)
    */
   const handleConfirmAddToCart = async (userDetails) => {
     try {
@@ -106,6 +197,10 @@ export const CartProvider = ({ children }) => {
       setCart(data.cart);
       setSubtotal(data.subtotal);
       setTotalItems(data.totalItems);
+
+      // Save customer details so the modal NEVER opens again for subsequent adds
+      setCustomerDetails(userDetails);
+      localStorage.setItem('customerDetails', JSON.stringify(userDetails));
 
       // If user/token is returned (e.g. for guest users), auto-authenticate in session
       if (data.token && data.user && setAuthData) {

@@ -136,21 +136,33 @@ const MyOrders = () => {
                           day: 'numeric',
                           month: 'short',
                           year: 'numeric',
+                        })}{' '}
+                        at{' '}
+                        {new Date(order.createdAt).toLocaleTimeString('en-IN', {
+                          hour: '2-digit',
+                          minute: '2-digit',
                         })}
                       </span>
                     </div>
 
                     <div>
-                      <span className="text-slate-400 font-semibold block">Total</span>
-                      <span className="font-bold text-slate-800">
+                      <span className="text-slate-400 font-semibold block">Total Amount</span>
+                      <span className="font-black text-slate-900 font-heading text-sm text-pink-600">
                         ₹{order.totalPrice.toLocaleString('en-IN')}
                       </span>
                     </div>
 
                     <div>
                       <span className="text-slate-400 font-semibold block">Ship To</span>
-                      <span className="font-bold text-slate-800 truncate max-w-[120px] block">
-                        {order.shippingAddress?.fullName}
+                      <span className="font-bold text-slate-800 truncate max-w-[140px] block" title={order.shippingAddress?.fullName}>
+                        {order.shippingAddress?.fullName || 'Customer'}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-slate-400 font-semibold block">Items</span>
+                      <span className="font-bold text-slate-700">
+                        {order.orderItems?.reduce((sum, i) => sum + (i.quantity || 1), 0)} Total
                       </span>
                     </div>
                   </div>
@@ -205,71 +217,125 @@ const MyOrders = () => {
                     </div>
                   )}
 
-                  {/* Order Items */}
-                  <div className="divide-y divide-slate-100">
-                    {order.orderItems.map((item, idx) => (
-                      <div key={idx} className="py-3 flex items-center gap-4">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-14 h-14 rounded-2xl object-cover bg-slate-50 flex-shrink-0"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <Link
-                            to={`/product/${item.product}`}
-                            className="text-xs font-bold text-slate-800 hover:text-pink-600 truncate block font-heading"
-                          >
-                            {item.name}
-                          </Link>
-                          <p className="text-[11px] text-slate-400">
-                            Qty: {item.quantity} × ₹{item.price.toLocaleString('en-IN')}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-xs font-extrabold text-slate-900 font-heading">
-                            ₹{(item.price * item.quantity).toLocaleString('en-IN')}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                  {/* Order Items (What was ordered) */}
+                  <div className="space-y-3">
+                    <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2">
+                      <ShoppingBag className="w-3.5 h-3.5 text-pink-500" />
+                      Toys in this Order ({order.orderItems?.length})
+                    </h4>
+                    <div className="divide-y divide-slate-100">
+                      {order.orderItems.map((item, idx) => {
+                        const prodId = item.product?._id || item.product;
+                        const itemImg =
+                          item.image ||
+                          item.product?.productImages?.[0] ||
+                          'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80';
+
+                        return (
+                          <div key={idx} className="py-3.5 flex items-center gap-4 group">
+                            <Link to={`/product/${prodId}`} className="relative flex-shrink-0">
+                              <img
+                                src={itemImg}
+                                alt={item.name}
+                                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform"
+                              />
+                            </Link>
+
+                            <div className="flex-1 min-w-0">
+                              <Link
+                                to={`/product/${prodId}`}
+                                className="text-sm font-bold text-slate-900 hover:text-pink-600 line-clamp-1 block font-heading transition-colors"
+                              >
+                                {item.name}
+                              </Link>
+                              <div className="flex flex-wrap items-center gap-2 mt-1">
+                                {item.product?.brand && (
+                                  <span className="px-2 py-0.5 rounded-md bg-pink-50 text-pink-700 font-extrabold text-[10px]">
+                                    {item.product.brand}
+                                  </span>
+                                )}
+                                <span className="text-xs text-slate-500 font-medium">
+                                  Quantity: <strong className="text-slate-800">{item.quantity}</strong>
+                                </span>
+                                <span className="text-xs text-slate-400">•</span>
+                                <span className="text-xs text-slate-500 font-medium">
+                                  Price: <strong className="text-slate-800">₹{item.price.toLocaleString('en-IN')}</strong> each
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="text-right flex-shrink-0">
+                              <span className="text-sm font-black text-slate-900 font-heading block">
+                                ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                              </span>
+                              <Link
+                                to={`/product/${prodId}`}
+                                className="text-[11px] font-bold text-pink-600 hover:text-pink-700 underline mt-1 inline-block"
+                              >
+                                View Toy
+                              </Link>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
 
-                  {/* Address & Payment Info */}
-                  <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-600">
-                    <div>
-                      <p className="font-bold text-slate-800 mb-1 flex items-center gap-1.5">
-                        <MapPin className="w-3.5 h-3.5 text-pink-500" /> Shipping Destination:
+                  {/* Address, Payment & Order Summary */}
+                  <div className="pt-4 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs text-slate-600">
+                    <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
+                      <p className="font-extrabold text-slate-800 mb-2 flex items-center gap-1.5 text-xs">
+                        <MapPin className="w-4 h-4 text-pink-500" /> Delivery Address:
                       </p>
-                      <p className="leading-relaxed">
-                        {order.shippingAddress?.fullName}, {order.shippingAddress?.streetAddress},{' '}
-                        {order.shippingAddress?.city}, {order.shippingAddress?.state} -{' '}
-                        {order.shippingAddress?.postalCode}
+                      <p className="font-bold text-slate-900 text-sm">
+                        {order.shippingAddress?.fullName || 'Customer'}
                       </p>
-                      <p className="font-bold text-slate-700 mt-1">
-                        Phone: {order.shippingAddress?.phoneNumber}
+                      <p className="leading-relaxed text-slate-600 mt-1">
+                        {order.shippingAddress?.streetAddress}, {order.shippingAddress?.city},{' '}
+                        {order.shippingAddress?.state} - {order.shippingAddress?.postalCode}
+                      </p>
+                      <p className="font-semibold text-slate-800 mt-2">
+                        📞 Phone: {order.shippingAddress?.phoneNumber}
                       </p>
                     </div>
 
-                    <div>
-                      <p className="font-bold text-slate-800 mb-1 flex items-center gap-1.5">
-                        <CreditCard className="w-3.5 h-3.5 text-pink-500" /> Payment Summary:
-                      </p>
-                      <p>Method: <span className="font-bold">{order.paymentMethod}</span></p>
-                      <p>
-                        Status:{' '}
-                        <span
-                          className={`font-bold ${
-                            order.isPaid ? 'text-emerald-600' : 'text-amber-600'
-                          }`}
-                        >
-                          {order.isPaid ? 'PAID' : 'Pending Payment'}
-                        </span>
-                      </p>
-                      {order.paymentResult?.id && (
-                        <p className="text-[10px] text-slate-400 font-mono mt-0.5">
-                          Ref: {order.paymentResult.id}
+                    <div className="bg-slate-50/70 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                      <div>
+                        <p className="font-extrabold text-slate-800 mb-2 flex items-center gap-1.5 text-xs">
+                          <CreditCard className="w-4 h-4 text-pink-500" /> Payment & Billing:
                         </p>
-                      )}
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between">
+                            <span className="text-slate-500">Payment Mode:</span>
+                            <span className="font-bold text-slate-800">{order.paymentMethod}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-500">Payment Status:</span>
+                            <span
+                              className={`px-2 py-0.5 rounded-full font-black text-[10px] uppercase ${
+                                order.isPaid
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : 'bg-amber-100 text-amber-800'
+                              }`}
+                            >
+                              {order.isPaid ? 'PAID' : 'Cash on Delivery'}
+                            </span>
+                          </div>
+                          <div className="flex justify-between border-t border-slate-200 pt-2 text-sm font-black text-slate-900 font-heading">
+                            <span>Amount Paid:</span>
+                            <span className="text-pink-600">₹{order.totalPrice.toLocaleString('en-IN')}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-3 mt-3 border-t border-slate-200 flex justify-end">
+                        <Link
+                          to="/shop"
+                          className="px-4 py-1.5 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow-sm shadow-pink-200 transition-all active:scale-95 flex items-center gap-1"
+                        >
+                          <ShoppingBag className="w-3.5 h-3.5" /> Buy More Toys
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Lock, Mail, ArrowRight, KeyRound, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import toyLogo from '../../assets/logo.png';
 
 const Login = () => {
   const { login } = useAuth();
@@ -25,8 +26,12 @@ const Login = () => {
 
     try {
       setLoading(true);
-      await login(email, password);
-      addToast('Welcome back to ToyVerse! 🧸', 'success');
+      const data = await login(email, password);
+      if (data?.isNewUser) {
+        addToast(`Welcome to Toy World, ${data.name || 'Friend'}! 🎈 Account created & signed in!`, 'success');
+      } else {
+        addToast(`Welcome back to Toy World, ${data?.name || 'Customer'}! 🧸`, 'success');
+      }
       navigate(from, { replace: true });
     } catch (err) {
       addToast(err.message, 'error');
@@ -45,11 +50,13 @@ const Login = () => {
       <div className="max-w-md w-full bg-white rounded-3xl p-8 sm:p-10 border border-slate-100 shadow-xl space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-pink-500 to-amber-400 mx-auto flex items-center justify-center text-3xl shadow-md shadow-pink-200">
-            🧸
-          </div>
+          <img
+            src={toyLogo}
+            alt="Toy World"
+            className="h-16 w-auto mx-auto object-contain drop-shadow-sm select-none"
+          />
           <h1 className="text-2xl font-black text-slate-900 font-heading">
-            Welcome to ToyVerse
+            Welcome to Toy World
           </h1>
           <p className="text-xs text-slate-500 font-medium">
             Sign in to unlock exclusive toy discounts, track orders, and curate your wishlist

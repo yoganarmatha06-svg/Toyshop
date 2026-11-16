@@ -512,7 +512,7 @@ const Home = () => {
         <div className="bg-amber-50/70 rounded-3xl p-8 sm:p-12 border border-amber-100 text-center space-y-8">
           <div className="max-w-xl mx-auto space-y-2">
             <span className="text-xs font-bold text-amber-700 uppercase tracking-widest">
-              The ToyVerse Promise
+              The Toy World Promise
             </span>
             <h3 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
               Why Parents Trust Our Toy Shop

@@ -4,7 +4,6 @@ import {
   SlidersHorizontal,
   X,
   Search,
-  ChevronDown,
   RotateCcw,
 } from 'lucide-react';
 import api from '../../services/api';
@@ -17,8 +16,6 @@ const Shop = () => {
   // State
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [brands, setBrands] = useState([]);
-  const [ageGroups, setAgeGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -27,35 +24,27 @@ const Shop = () => {
   // Filters from URL or defaults
   const keyword = searchParams.get('search') || '';
   const selectedCategory = searchParams.get('category') || 'all';
-  const selectedBrand = searchParams.get('brand') || 'all';
-  const selectedAgeGroup = searchParams.get('ageGroup') || 'all';
   const sortBy = searchParams.get('sort') || 'featured';
   const featuredOnly = searchParams.get('featured') === 'true';
   const minPrice = searchParams.get('minPrice') || '';
   const maxPrice = searchParams.get('maxPrice') || '';
-  const inStockOnly = searchParams.get('inStock') === 'true';
   const currentPage = Number(searchParams.get('page')) || 1;
 
   // Local search input
   const [searchInput, setSearchInput] = useState(keyword);
 
-  // Load Categories & Filter Meta once
+  // Load Categories once
   useEffect(() => {
-    const fetchMetadata = async () => {
+    const fetchCategories = async () => {
       try {
-        const [catRes, metaRes] = await Promise.all([
-          api.get('/categories'),
-          api.get('/products/meta/filters'),
-        ]);
-        setCategories(catRes.data || []);
-        setBrands(metaRes.data?.brands || []);
-        setAgeGroups(metaRes.data?.ageGroups || []);
+        const { data } = await api.get('/categories');
+        setCategories(data || []);
       } catch (err) {
-        console.error('Error fetching filter metadata:', err);
+        console.error('Error fetching categories:', err);
       }
     };
 
-    fetchMetadata();
+    fetchCategories();
   }, []);
 
   // Sync search input if URL changes
@@ -73,13 +62,10 @@ const Shop = () => {
           limit: 12,
           keyword,
           category: selectedCategory,
-          brand: selectedBrand,
-          ageGroup: selectedAgeGroup,
           sort: sortBy,
           featured: featuredOnly ? 'true' : undefined,
           minPrice: minPrice || undefined,
           maxPrice: maxPrice || undefined,
-          inStock: inStockOnly ? 'true' : undefined,
         };
 
         const { data } = await api.get('/products', { params });
@@ -97,13 +83,10 @@ const Shop = () => {
   }, [
     keyword,
     selectedCategory,
-    selectedBrand,
-    selectedAgeGroup,
     sortBy,
     featuredOnly,
     minPrice,
     maxPrice,
-    inStockOnly,
     currentPage,
   ]);
 
@@ -131,11 +114,8 @@ const Shop = () => {
   const activeFiltersCount = [
     keyword,
     selectedCategory !== 'all' ? selectedCategory : '',
-    selectedBrand !== 'all' ? selectedBrand : '',
-    selectedAgeGroup !== 'all' ? selectedAgeGroup : '',
     minPrice,
     maxPrice,
-    inStockOnly ? 'inStock' : '',
   ].filter(Boolean).length;
 
   return (
@@ -217,7 +197,7 @@ const Shop = () => {
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Name or brand..."
+                placeholder="Search toys by name..."
                 className="w-full pl-9 pr-8 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
               />
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -273,38 +253,6 @@ const Shop = () => {
             </div>
           </div>
 
-          {/* Age Group Filter */}
-          <div>
-            <h3 className="text-xs font-black text-slate-900 font-heading uppercase tracking-wider mb-2.5">
-              Age Group
-            </h3>
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                onClick={() => updateParam('ageGroup', 'all')}
-                className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
-                  selectedAgeGroup === 'all'
-                    ? 'bg-slate-900 text-white border-slate-900'
-                    : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                All Ages
-              </button>
-              {ageGroups.map((age) => (
-                <button
-                  key={age}
-                  onClick={() => updateParam('ageGroup', age)}
-                  className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
-                    selectedAgeGroup === age
-                      ? 'bg-pink-500 text-white border-pink-500 shadow-xs'
-                      : 'bg-white text-slate-600 border-slate-200 hover:border-pink-200'
-                  }`}
-                >
-                  {age}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {/* Price Range */}
           <div>
             <h3 className="text-xs font-black text-slate-900 font-heading uppercase tracking-wider mb-2.5">
@@ -328,51 +276,6 @@ const Shop = () => {
               />
             </div>
           </div>
-
-          {/* Brands */}
-          {brands.length > 0 && (
-            <div>
-              <h3 className="text-xs font-black text-slate-900 font-heading uppercase tracking-wider mb-2.5">
-                Brand
-              </h3>
-              <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
-                <button
-                  onClick={() => updateParam('brand', 'all')}
-                  className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-bold ${
-                    selectedBrand === 'all' ? 'bg-pink-100 text-pink-700' : 'text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  All Brands
-                </button>
-                {brands.map((brand) => (
-                  <button
-                    key={brand}
-                    onClick={() => updateParam('brand', brand)}
-                    className={`w-full text-left px-3 py-1.5 rounded-xl text-xs font-semibold ${
-                      selectedBrand.toLowerCase() === brand.toLowerCase()
-                        ? 'bg-pink-100 text-pink-700 font-bold'
-                        : 'text-slate-600 hover:bg-slate-50'
-                    }`}
-                  >
-                    {brand}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* In Stock Only Checkbox */}
-          <div className="pt-2 border-t border-slate-100">
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={inStockOnly}
-                onChange={(e) => updateParam('inStock', e.target.checked)}
-                className="w-4 h-4 text-pink-500 rounded-sm border-slate-300 focus:ring-pink-400"
-              />
-              <span>In-Stock Only</span>
-            </label>
-          </div>
         </aside>
 
         {/* Product Grid Area */}
@@ -386,7 +289,7 @@ const Shop = () => {
                 No matching toys found!
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Try clearing your search query or adjusting your price, age group, or category filters.
+                Try clearing your search query or adjusting your price or category filters.
               </p>
               <button
                 onClick={handleResetFilters}
@@ -480,25 +383,6 @@ const Shop = () => {
                     className="w-full text-left py-1 text-xs text-slate-600 hover:text-pink-600 block truncate"
                   >
                     {c.icon} {c.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Age Group */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-800 uppercase mb-2">Age Group</h4>
-              <div className="flex flex-wrap gap-1.5">
-                {ageGroups.map((age) => (
-                  <button
-                    key={age}
-                    onClick={() => {
-                      updateParam('ageGroup', age);
-                      setMobileFiltersOpen(false);
-                    }}
-                    className="px-2.5 py-1 text-xs rounded-full border border-slate-200"
-                  >
-                    {age}
                   </button>
                 ))}
               </div>

@@ -5,6 +5,7 @@ import carsAndVehiclesImg from '../assets/car and vechile.jpg';
 import dollImg from '../assets/doll.jpg';
 import remoteControlImg from '../assets/remote.jpg';
 import outdoorImg from '../assets/outer.jpg';
+import puzzleGameImg from '../assets/puzzle game.png';
 
 /**
  * Returns the exact image asset and display configuration for a given category.
@@ -99,6 +100,16 @@ export const getCategoryImage = (category) => {
       alt: category.name || 'Outdoor Toys',
       fit: 'cover',
       padding: 'p-0',
+    };
+  }
+
+  // 8. Puzzle Games
+  if (name.includes('puzzle') || slug.includes('puzzle')) {
+    return {
+      src: puzzleGameImg,
+      alt: category.name || 'Puzzle Games',
+      fit: 'contain',
+      padding: 'p-1',
     };
   }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Trash2,
@@ -7,6 +7,9 @@ import {
   ShieldCheck,
   Truck,
   Tag,
+  Lock,
+  Sparkles,
+  CheckCircle2,
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
@@ -21,14 +24,41 @@ const Cart = () => {
   const [promoCode, setPromoCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
 
+  // Coupon code is enabled ONLY when purchase amount (subtotal) is above ₹2,000
+  const COUPON_MIN_PURCHASE = 2000;
+  const isCouponEnabled = subtotal > COUPON_MIN_PURCHASE;
+
+  // Auto-remove applied coupon if user reduces cart subtotal to <= ₹2,000
+  useEffect(() => {
+    if (!isCouponEnabled && discountPercent > 0) {
+      setDiscountPercent(0);
+      setPromoCode('');
+      addToast('Coupon removed: Minimum purchase above ₹2,000 required', 'info');
+    }
+  }, [subtotal, isCouponEnabled, discountPercent, addToast]);
+
   const handleApplyPromo = (e) => {
     e.preventDefault();
+    if (!isCouponEnabled) {
+      addToast(
+        `Coupon codes are enabled only for purchases above ₹${COUPON_MIN_PURCHASE.toLocaleString('en-IN')}`,
+        'error'
+      );
+      return;
+    }
+
     if (promoCode.trim().toUpperCase() === 'TOYJOY') {
       setDiscountPercent(15);
       addToast('Promo code applied! 15% discount granted! 🎉', 'success');
     } else {
       addToast('Invalid promo code. Try "TOYJOY"', 'error');
     }
+  };
+
+  const handleRemovePromo = () => {
+    setDiscountPercent(0);
+    setPromoCode('');
+    addToast('Coupon removed', 'info');
   };
 
   if (!isAuthenticated) {
@@ -230,29 +260,85 @@ const Cart = () => {
             </h3>
 
             {/* Promo Code Form */}
-            <form onSubmit={handleApplyPromo} className="space-y-2">
-              <label className="text-xs font-bold text-slate-600 flex items-center gap-1.5">
-                <Tag className="w-3.5 h-3.5 text-pink-500" /> Have a Coupon?
-              </label>
+            <form onSubmit={handleApplyPromo} className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-pink-500" /> Have a Coupon?
+                </label>
+                {isCouponEnabled ? (
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-emerald-600" /> Unlocked
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-slate-400" /> Locked (&gt; ₹2,000)
+                  </span>
+                )}
+              </div>
+
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="e.g. TOYJOY"
+                  placeholder={isCouponEnabled ? 'e.g. TOYJOY' : 'Purchase above ₹2,000 to unlock'}
                   value={promoCode}
+                  disabled={!isCouponEnabled}
                   onChange={(e) => setPromoCode(e.target.value)}
-                  className="w-full px-3 py-2 text-xs uppercase bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
+                  className={`w-full px-3 py-2 text-xs uppercase border rounded-xl transition-all ${
+                    isCouponEnabled
+                      ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400'
+                      : 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed select-none placeholder:text-slate-400'
+                  }`}
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl"
+                  disabled={!isCouponEnabled || !promoCode.trim()}
+                  className={`px-4 py-2 font-bold text-xs rounded-xl transition-all flex items-center justify-center ${
+                    isCouponEnabled && promoCode.trim()
+                      ? 'bg-pink-500 hover:bg-pink-600 active:scale-95 text-white shadow-sm shadow-pink-200 cursor-pointer'
+                      : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                  }`}
                 >
                   Apply
                 </button>
               </div>
+
+              {/* Status & Hints */}
+              {!isCouponEnabled && (
+                <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/70 text-[11px] text-amber-900 font-medium flex items-start gap-2">
+                  <Lock className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <span>
+                    Coupon code unlocks on purchases <strong>above ₹2,000</strong>. Add{' '}
+                    <strong className="text-pink-600 font-bold">
+                      ₹{(COUPON_MIN_PURCHASE - subtotal + 1).toLocaleString('en-IN')}
+                    </strong>{' '}
+                    more toys to enable!
+                  </span>
+                </div>
+              )}
+
+              {isCouponEnabled && discountPercent === 0 && (
+                <div className="p-2 rounded-xl bg-emerald-50/80 border border-emerald-200/70 text-[11px] text-emerald-800 font-medium flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+                  <span>
+                    Eligible! Apply code <strong className="font-mono text-emerald-900">TOYJOY</strong> for 15% discount.
+                  </span>
+                </div>
+              )}
+
               {discountPercent > 0 && (
-                <p className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                  <Tag className="w-3 h-3" /> 15% ToyJoy discount applied!
-                </p>
+                <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-[11px] font-bold text-emerald-800 flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    15% ToyJoy discount applied (-₹{discountAmount.toLocaleString('en-IN')})
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleRemovePromo}
+                    className="text-xs text-rose-500 hover:text-rose-700 underline font-bold cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
               )}
             </form>
 
@@ -296,8 +382,16 @@ const Cart = () => {
 
             {/* Checkout Action */}
             <button
-              onClick={() => navigate('/checkout')}
-              className="w-full py-4 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-extrabold text-sm shadow-lg shadow-pink-300/50 hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+              onClick={() =>
+                navigate('/checkout', {
+                  state: {
+                    discountPercent: isCouponEnabled ? discountPercent : 0,
+                    discountAmount: isCouponEnabled ? discountAmount : 0,
+                    promoCode: isCouponEnabled ? promoCode : '',
+                  },
+                })
+              }
+              className="w-full py-4 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-extrabold text-sm shadow-lg shadow-pink-300/50 hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Proceed to Checkout</span>
               <ArrowRight className="w-4 h-4" />

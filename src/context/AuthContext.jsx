@@ -63,6 +63,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem('token');
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('customerDetails');
   };
 
   const updateProfile = async (userData) => {
@@ -73,6 +74,19 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', data.token);
     }
     localStorage.setItem('userInfo', JSON.stringify(data));
+    return data;
+  };
+
+  const uploadAvatar = async (file) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    const { data } = await api.post('/auth/upload-avatar', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    if (data.user) {
+      setUser((prev) => ({ ...prev, ...data.user }));
+      localStorage.setItem('userInfo', JSON.stringify({ ...user, ...data.user }));
+    }
     return data;
   };
 
@@ -101,6 +115,7 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         updateProfile,
+        uploadAvatar,
         setAuthData,
       }}
     >

@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, .font-heading {
+    font-family: 'Fredoka', 'Plus Jakarta Sans', cursive, sans-serif;
+  }
+
+  .font-nav {
+    font-family: 'Fredoka', 'Quicksand', 'Plus Jakarta Sans', cursive, sans-serif;
+  }
+
+  .font-logo {
+    font-family: 'Bubblegum Sans', 'Fredoka', 'Baloo 2', 'Quicksand', cursive, sans-serif;
+  }
+}
+
+/* Custom playful utility classes */
+.toy-card-shadow {
+  box-shadow: 0 10px 25px -5px rgba(251, 146, 60, 0.08), 0 8px 10px -6px rgba(236, 72, 153, 0.05);
+}
+
+.toy-card-hover {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toy-card-hover:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 30px -10px rgba(251, 146, 60, 0.15), 0 12px 15px -8px rgba(236, 72, 153, 0.1);
+}
+
+
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #fdf2f8;
+}
+::-webkit-scrollbar-thumb {
+  background: #f472b6;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ec4899;
+}
+

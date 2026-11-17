@@ -144,13 +144,9 @@ const Navbar = () => {
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 border border-white/25 hover:bg-white/25 transition-all cursor-pointer text-white shadow-2xs hover:scale-105 active:scale-95"
                 >
-                  {user?.avatar && user.avatar.trim() !== '' && !user.avatar.includes('photo-1534528741775-53994a69daeb') && (
-                    <img
-                      src={user.avatar}
-                      alt={user?.name}
-                      className="w-7 h-7 rounded-full object-cover ring-2 ring-white/70 flex-shrink-0"
-                    />
-                  )}
+                  <div className="w-6 h-6 rounded-full bg-white/25 text-white font-black text-xs flex items-center justify-center flex-shrink-0">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </div>
                   <span className="text-xs sm:text-sm font-bold text-white max-w-[120px] truncate">
                     {user?.name?.split(' ')[0]}
                   </span>
@@ -167,17 +163,9 @@ const Navbar = () => {
                       className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden"
                     >
                       <div className="px-4 py-3 border-b border-slate-100 flex items-center gap-3">
-                        {user?.avatar && user.avatar.trim() !== '' && !user.avatar.includes('photo-1534528741775-53994a69daeb') ? (
-                          <img
-                            src={user.avatar}
-                            alt={user?.name}
-                            className="w-10 h-10 rounded-full object-cover ring-2 ring-pink-400 flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold flex items-center justify-center flex-shrink-0 shadow-xs text-sm">
-                            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                          </div>
-                        )}
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold flex items-center justify-center flex-shrink-0 shadow-xs text-sm">
+                          {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                        </div>
                         <div className="truncate flex-1">
                           <p className="text-sm font-bold text-slate-800 truncate">{user?.name}</p>
                           <p className="text-xs text-slate-400 truncate">{user?.email}</p>
@@ -317,17 +305,9 @@ const Navbar = () => {
                 {/* User Card if Authenticated */}
                 {isAuthenticated && (
                   <div className="bg-white/15 p-3 rounded-2xl flex items-center gap-3 border border-white/25">
-                    {user?.avatar && user.avatar.trim() !== '' && !user.avatar.includes('photo-1534528741775-53994a69daeb') ? (
-                      <img
-                        src={user.avatar}
-                        alt={user?.name}
-                        className="w-10 h-10 rounded-full object-cover ring-2 ring-white/70"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-white/25 text-white font-bold flex items-center justify-center text-sm">
-                        {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-                      </div>
-                    )}
+                    <div className="w-10 h-10 rounded-full bg-white/25 text-white font-bold flex items-center justify-center text-sm">
+                      {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
                     <div className="truncate flex-1">
                       <p className="text-sm font-bold text-white truncate">{user?.name}</p>
                       <p className="text-[11px] text-white/80 truncate">{user?.email}</p>

@@ -46,12 +46,7 @@ const MobileBottomNav = () => {
       name: isAuthenticated ? (user?.name?.split(' ')[0] || 'Account') : 'Account',
       path: isAuthenticated ? '/profile' : '/login',
       icon: User,
-      hasAvatar: Boolean(
-        user?.avatar &&
-          user.avatar.trim() !== '' &&
-          !user.avatar.includes('photo-1534528741775-53994a69daeb')
-      ),
-      avatarUrl: user?.avatar,
+      hasAvatar: false,
     },
   ];
 

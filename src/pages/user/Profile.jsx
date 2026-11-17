@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   User as UserIcon,
   MapPin,
@@ -9,41 +9,22 @@ import {
   Save,
   Phone,
   Mail,
-  Camera,
-  Upload,
-  HardDrive,
-  Loader2,
-  Sparkles,
-  Link as LinkIcon,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import api from '../../services/api';
 import Loader from '../../components/Loader/Loader';
 
-const PRESET_AVATARS = [
-  { name: 'Teddy 🧸', url: 'https://images.unsplash.com/photo-1559454403-b8fb88521f11?auto=format&fit=crop&w=250&q=80' },
-  { name: 'Robot 🤖', url: 'https://images.unsplash.com/photo-1546776310-eef45dd6d63c?auto=format&fit=crop&w=250&q=80' },
-  { name: 'Unicorn 🦄', url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=250&q=80' },
-  { name: 'Doll 👧', url: 'https://images.unsplash.com/photo-1582234372722-50d7ccc30ebd?auto=format&fit=crop&w=250&q=80' },
-  { name: 'Racer 🏎️', url: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=250&q=80' },
-  { name: 'Panda 🐼', url: 'https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?auto=format&fit=crop&w=250&q=80' },
-];
-
 const Profile = () => {
-  const { user, updateProfile, uploadAvatar } = useAuth();
+  const { user, updateProfile } = useAuth();
   const { addToast } = useToast();
 
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [phone, setPhone] = useState(user?.phone || '');
-  const [avatar, setAvatar] = useState(user?.avatar || '');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [updatingProfile, setUpdatingProfile] = useState(false);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const [showUrlInput, setShowUrlInput] = useState(false);
-  const fileInputRef = useRef(null);
 
   // Address Management
   const [addresses, setAddresses] = useState([]);
@@ -65,43 +46,8 @@ const Profile = () => {
       setName(user.name || '');
       setEmail(user.email || '');
       setPhone(user.phone || '');
-      // If avatar is the default stock woman photo, reset to empty so user sees placeholder
-      const currentAvatar = (user.avatar && !user.avatar.includes('photo-1534528741775-53994a69daeb')) ? user.avatar : '';
-      setAvatar(currentAvatar);
     }
   }, [user]);
-
-  const handleFileChange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      addToast('Please select a valid image file (JPG, PNG, WebP)', 'error');
-      return;
-    }
-
-    if (file.size > 20 * 1024 * 1024) {
-      addToast('Image size should be less than 20MB', 'error');
-      return;
-    }
-
-    try {
-      setUploadingPhoto(true);
-      // Immediately preview local file on screen
-      const localPreviewUrl = URL.createObjectURL(file);
-      setAvatar(localPreviewUrl);
-
-      // Upload directly to server local disk via Multer endpoint
-      const result = await uploadAvatar(file);
-      setAvatar(result.avatar);
-      addToast('Photo uploaded from local disk and saved! ✨', 'success');
-    } catch (err) {
-      addToast(err.message || 'Failed to upload photo from disk', 'error');
-    } finally {
-      setUploadingPhoto(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
 
   const fetchAddresses = async () => {
     try {
@@ -132,7 +78,7 @@ const Profile = () => {
 
     try {
       setUpdatingProfile(true);
-      const payload = { name, email, phone, avatar };
+      const payload = { name, email, phone };
       if (password) payload.password = password;
 
       await updateProfile(payload);
@@ -207,150 +153,13 @@ const Profile = () => {
           </h2>
 
           <form onSubmit={handleProfileSubmit} className="space-y-4">
-            {/* Avatar Upload / Selector */}
-            <div className="bg-gradient-to-br from-pink-50/80 via-purple-50/50 to-white p-4 sm:p-5 rounded-2xl border border-pink-100/80 shadow-2xs space-y-3.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                  <Camera className="w-4 h-4 text-pink-500" /> Profile Photo
-                </label>
-                {avatar && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAvatar('');
-                      addToast('Photo removed. Click "Save Profile Changes" to confirm.', 'info');
-                    }}
-                    className="text-[11px] font-bold text-rose-500 hover:text-rose-700 hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <Trash2 className="w-3 h-3" /> Remove Photo
-                  </button>
-                )}
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                {/* Photo Preview / Click to upload */}
-                <div
-                  onClick={() => fileInputRef.current?.click()}
-                  className="relative group cursor-pointer flex-shrink-0"
-                  title="Click to choose a photo from device"
-                >
-                  {avatar ? (
-                    <img
-                      src={avatar}
-                      alt="Profile Avatar"
-                      className="w-20 h-20 rounded-full object-cover ring-4 ring-pink-300 shadow-md group-hover:opacity-90 transition-opacity"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white font-black text-2xl flex items-center justify-center ring-4 ring-pink-200 shadow-md">
-                      {name ? name.charAt(0).toUpperCase() : 'U'}
-                    </div>
-                  )}
-
-                  <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity">
-                    <Camera className="w-5 h-5" />
-                    <span className="text-[9px] font-bold mt-0.5">Upload</span>
-                  </div>
-
-                  <span className="absolute bottom-0 right-0 p-1.5 bg-pink-500 text-white rounded-full shadow-md ring-2 ring-white">
-                    <Camera className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-
-                {/* Upload Button & Actions */}
-                <div className="flex-1 space-y-2 text-center sm:text-left w-full">
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    accept="image/*"
-                    className="hidden"
-                  />
-
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                    <button
-                      type="button"
-                      disabled={uploadingPhoto}
-                      onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer disabled:opacity-60"
-                    >
-                      {uploadingPhoto ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" /> Uploading from Disk...
-                        </>
-                      ) : (
-                        <>
-                          <HardDrive className="w-3.5 h-3.5" /> Upload from Local Disk
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setShowUrlInput(!showUrlInput)}
-                      className="inline-flex items-center gap-1 px-3 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-bold rounded-xl transition-colors cursor-pointer"
-                    >
-                      <LinkIcon className="w-3.5 h-3.5 text-slate-500" /> Image Link
-                    </button>
-                  </div>
-
-                  <p className="text-[11px] text-slate-500">
-                    Choose any photo from your local disk (C:\, D:\, Pictures, Downloads, etc.) or mobile gallery.
-                  </p>
-                </div>
-              </div>
-
-              {/* Optional Image URL Input */}
-              {showUrlInput && (
-                <div className="pt-2">
-                  <input
-                    type="url"
-                    value={avatar}
-                    onChange={(e) => setAvatar(e.target.value)}
-                    placeholder="Paste image URL (e.g. https://...)"
-                    className="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400"
-                  />
-                </div>
-              )}
-
-              {/* Preset Toy Character Avatars */}
-              <div className="pt-3 border-t border-pink-100">
-                <span className="text-[11px] font-bold text-slate-600 flex items-center gap-1 mb-2">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" /> Or pick a fun toy avatar:
-                </span>
-                <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-                  {PRESET_AVATARS.map((preset) => (
-                    <button
-                      key={preset.name}
-                      type="button"
-                      onClick={() => {
-                        setAvatar(preset.url);
-                        addToast(`Selected ${preset.name} avatar! Click Save to apply.`, 'info');
-                      }}
-                      className={`relative flex-shrink-0 p-1 rounded-full border-2 transition-all cursor-pointer hover:scale-110 ${
-                        avatar === preset.url
-                          ? 'border-pink-500 ring-2 ring-pink-300 scale-105'
-                          : 'border-transparent hover:border-pink-300'
-                      }`}
-                      title={preset.name}
-                    >
-                      <img
-                        src={preset.url}
-                        alt={preset.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Full Name</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400"
+                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400 min-h-[44px]"
                 required
               />
             </div>

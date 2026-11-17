@@ -1,7 +1,22 @@
 import axios from 'axios';
 
+// In development, use local Vite proxy ('/api'). In production, default to live Render backend if not set.
+const defaultBaseUrl = import.meta.env.DEV
+  ? '/api'
+  : 'https://toyshop-6xha.onrender.com/api';
+
+let rawUrl = (import.meta.env.VITE_API_URL || defaultBaseUrl).trim();
+
+// Strip trailing slashes
+rawUrl = rawUrl.replace(/\/+$/, '');
+
+// If it is a full URL (starts with http) and doesn't end with '/api', auto-append '/api'
+if (rawUrl.startsWith('http') && !rawUrl.endsWith('/api')) {
+  rawUrl = `${rawUrl}/api`;
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: rawUrl,
   headers: {
     'Content-Type': 'application/json',
   },

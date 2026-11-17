@@ -105,12 +105,12 @@ const Wishlist = () => {
                 className="aspect-square rounded-2xl overflow-hidden bg-slate-50 mb-3"
               >
                 <img
-                  src={
-                    product.productImages?.[0] ||
-                    'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=400&q=80'
-                  }
+                  src={product.productImages?.[0] || '/logo.png'}
                   alt={product.name}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    e.currentTarget.src = '/logo.png';
+                  }}
+                  className="w-full h-full object-contain p-1 hover:scale-105 transition-transform duration-300"
                 />
               </Link>
 

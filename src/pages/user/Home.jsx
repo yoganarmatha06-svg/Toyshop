@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   motion,
   useScroll,
@@ -29,6 +29,7 @@ import teddyBearImg from '../../assets/t1-removebg-preview.png';
 import t2Img from '../../assets/t2-removebg-preview.png';
 
 const Home = () => {
+  const location = useLocation();
   const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
@@ -53,6 +54,8 @@ const Home = () => {
 
   const [currentBanner, setCurrentBanner] = useState(0);
   const [isBannerHovered, setIsBannerHovered] = useState(false);
+  const [touchStartX, setTouchStartX] = useState(null);
+  const [touchEndX, setTouchEndX] = useState(null);
 
   const nextBanner = () => {
     setCurrentBanner((prev) => (prev + 1) % heroBanners.length);
@@ -60,6 +63,27 @@ const Home = () => {
 
   const prevBanner = () => {
     setCurrentBanner((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
+  };
+
+  const handleTouchStart = (e) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+    setTouchEndX(null);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null) return;
+    const distance = touchStartX - touchEndX;
+    if (distance > 45) {
+      nextBanner(); // Swiped left -> next
+    } else if (distance < -45) {
+      prevBanner(); // Swiped right -> previous
+    }
+    setTouchStartX(null);
+    setTouchEndX(null);
   };
 
   // Auto-slide to next banner with smooth 0.2s transition
@@ -114,6 +138,19 @@ const Home = () => {
     fetchData();
   }, []);
 
+  // Smoothly scroll to Categories when requested via hash (/#categories)
+  useEffect(() => {
+    if (!loading && (location.hash === '#categories' || window.location.hash === '#categories')) {
+      const scrollTimer = setTimeout(() => {
+        const el = document.getElementById('categories');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+      return () => clearTimeout(scrollTimer);
+    }
+  }, [loading, location.hash]);
+
   if (loading) {
     return <Loader fullScreen text="Opening the Magic Toy Chest..." />;
   }
@@ -153,6 +190,9 @@ const Home = () => {
         transition={{ duration: 0.6 }}
         onMouseEnter={() => setIsBannerHovered(true)}
         onMouseLeave={() => setIsBannerHovered(false)}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         className="relative w-full overflow-hidden select-none group"
       >
         {/* Banner Track with 0.1s Ultra-Fast Smooth Slide */}
@@ -167,7 +207,7 @@ const Home = () => {
                 <img
                   src={banner.src}
                   alt={banner.alt}
-                  className="w-full aspect-[2.67/1] object-contain sm:object-cover object-center block select-none bg-gradient-to-r from-pink-50/50 via-purple-50/50 to-pink-50/50"
+                  className="w-full aspect-[16/9] sm:aspect-[2.67/1] object-cover object-center block select-none bg-gradient-to-r from-pink-50/50 via-purple-50/50 to-pink-50/50"
                 />
               </Link>
             </div>
@@ -199,7 +239,7 @@ const Home = () => {
         </button>
 
         {/* Bottom Pagination Dots */}
-        <div className="absolute bottom-1.5 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 sm:gap-2 bg-slate-900/35 backdrop-blur-xs px-2 sm:px-3 py-0.5 sm:py-1.5 rounded-full">
+        <div className="absolute bottom-2.5 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 sm:gap-2 bg-slate-900/35 backdrop-blur-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
           {heroBanners.map((banner, idx) => (
             <button
               key={banner.id}
@@ -280,11 +320,12 @@ const Home = () => {
 
       {/* 10 Toy Categories Section - Centered & Dynamic Scroll Stagger */}
       <motion.section
+        id="categories"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: false, amount: 0.15 }}
         transition={{ duration: 0.5 }}
-        className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative"
+        className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 relative scroll-mt-24 sm:scroll-mt-28"
       >
         {/* Floating Pink Teddy Bear at Left Corner - Hidden on small mobile to avoid overflow */}
         <div className="hidden sm:block absolute -top-10 sm:-top-14 md:-top-16 left-1 sm:left-4 lg:-left-6 z-20 pointer-events-none">

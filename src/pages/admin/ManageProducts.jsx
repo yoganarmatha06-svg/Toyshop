@@ -195,12 +195,12 @@ const ManageProducts = () => {
                       <div className="flex items-center gap-3">
                         <div className="relative flex-shrink-0">
                           <img
-                            src={
-                              prod.productImages?.[0] ||
-                              'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=200&q=80'
-                            }
+                            src={prod.productImages?.[0] || '/logo.png'}
                             alt={prod.name}
-                            className="w-12 h-12 rounded-xl object-cover bg-slate-50 border border-slate-100 flex-shrink-0"
+                            onError={(e) => {
+                              e.currentTarget.src = '/logo.png';
+                            }}
+                            className="w-12 h-12 rounded-xl object-contain bg-white border border-slate-100 flex-shrink-0 p-1"
                           />
                           {prod.productImages && prod.productImages.length > 1 && (
                             <span

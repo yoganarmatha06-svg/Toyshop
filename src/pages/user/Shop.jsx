@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import {
   SlidersHorizontal,
   X,
   Search,
   RotateCcw,
+  ArrowLeft,
 } from 'lucide-react';
 import api from '../../services/api';
 import ProductCard from '../../components/ProductCard/ProductCard';
@@ -120,14 +121,39 @@ const Shop = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header & Breadcrumb */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-black text-slate-900 font-heading">
-          Explore All Toys 🧸
-        </h1>
-        <p className="text-sm text-slate-500 font-medium">
-          Showing {totalProducts} whimsical toys ready for adventure
-        </p>
+      {/* Header & Back Navigation to Categories */}
+      <div className="mb-6 space-y-3">
+        {/* Quick Back to Categories Pill */}
+        <div>
+          <Link
+            to="/#categories"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-50 hover:bg-pink-100 text-pink-600 hover:text-pink-700 text-xs font-bold transition-all border border-pink-200 shadow-xs hover:shadow-sm active:scale-95 group cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+            <span>Explore 10 Toy Categories</span>
+          </Link>
+        </div>
+
+        {/* Title with Back Arrow Button */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Link
+            to="/#categories"
+            className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white hover:bg-pink-50 border border-slate-200 hover:border-pink-300 text-slate-700 hover:text-pink-600 shadow-xs hover:shadow-md transition-all active:scale-90 group flex items-center justify-center shrink-0 cursor-pointer"
+            aria-label="Back to Explore 10 Toy Categories"
+            title="Back to Explore 10 Toy Categories"
+          >
+            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 transition-transform group-hover:-translate-x-1 text-slate-700 group-hover:text-pink-600" />
+          </Link>
+
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading tracking-tight flex items-center gap-2">
+              Explore All Toys 🧸
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">
+              Showing {totalProducts} whimsical toys ready for adventure
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Mobile Filters button & Sort Dropdown bar */}

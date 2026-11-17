@@ -143,12 +143,12 @@ const AddToCartModal = ({ isOpen, onClose, onConfirm, product, quantity = 1, loa
             {product && (
               <div className="flex items-center gap-3.5 p-3 rounded-2xl bg-pink-50/60 border border-pink-100">
                 <img
-                  src={
-                    product.productImages?.[0] ||
-                    'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=200&q=80'
-                  }
+                  src={product.productImages?.[0] || '/logo.png'}
                   alt={product.name}
-                  className="w-14 h-14 rounded-xl object-cover shrink-0 border border-white shadow-xs"
+                  onError={(e) => {
+                    e.currentTarget.src = '/logo.png';
+                  }}
+                  className="w-14 h-14 rounded-xl object-contain bg-white shrink-0 border border-white shadow-xs p-1"
                 />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-xs font-bold text-slate-800 truncate font-heading">

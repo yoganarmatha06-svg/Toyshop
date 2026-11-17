@@ -188,9 +188,7 @@ const EditProduct = () => {
     }
 
     if (finalImages.length === 0) {
-      finalImages = [
-        'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=800&q=80',
-      ];
+      finalImages = ['/logo.png'];
     }
 
     try {
@@ -530,8 +528,27 @@ const EditProduct = () => {
                 ))}
               </div>
             ) : (
-              <div className="p-6 bg-slate-50 border border-dashed border-slate-200 rounded-2xl text-center text-xs text-slate-400">
-                No images added yet. Upload files or paste URLs above to add images.
+              <div className="p-4 bg-gradient-to-r from-pink-50/60 to-purple-50/60 border border-dashed border-pink-300 rounded-2xl flex flex-col sm:flex-row items-center gap-4">
+                <div className="w-16 h-16 rounded-xl bg-white border border-pink-200 p-2 shadow-sm flex items-center justify-center shrink-0">
+                  <img
+                    src="/logo.png"
+                    alt="Toy World Default Logo"
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+                <div className="text-center sm:text-left">
+                  <div className="flex items-center justify-center sm:justify-start gap-2">
+                    <span className="text-xs font-bold text-slate-800">
+                      Default Product Image: Toy World Logo
+                    </span>
+                    <span className="text-[10px] bg-pink-100 text-pink-700 font-black px-2 py-0.5 rounded-full">
+                      Auto Default
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-0.5">
+                    No image uploaded yet. If you save without adding an image, our official store logo will automatically be used as the product image!
+                  </p>
+                </div>
               </div>
             )}
           </div>

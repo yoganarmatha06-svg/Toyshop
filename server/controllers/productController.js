@@ -174,9 +174,7 @@ export const createProduct = async (req, res) => {
     const images =
       Array.isArray(productImages) && productImages.length > 0
         ? productImages
-        : [
-            'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=800&q=80',
-          ];
+        : ['/logo.png'];
 
     const safeStock = stockQuantity !== undefined && stockQuantity !== '' ? Number(stockQuantity) : 10;
 

@@ -229,7 +229,7 @@ const MyOrders = () => {
                         const itemImg =
                           item.image ||
                           item.product?.productImages?.[0] ||
-                          'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80';
+                          '/logo.png';
 
                         return (
                           <div key={idx} className="py-3 flex items-center gap-3 sm:gap-4 group">

@@ -181,9 +181,12 @@ const Cart = () => {
                   className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-50 flex-shrink-0"
                 >
                   <img
-                    src={prod.productImages?.[0] || 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=300&q=80'}
+                    src={prod.productImages?.[0] || '/logo.png'}
                     alt={prod.name}
-                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/logo.png';
+                    }}
+                    className="w-full h-full object-contain p-1"
                   />
                 </Link>
 

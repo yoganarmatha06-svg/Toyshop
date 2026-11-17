@@ -1,18 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Shield, Lock, Mail, ArrowRight, KeyRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import toyLogo from '../../assets/logo.png';
+import Loader from '../../components/Loader/Loader';
 
 const AdminLogin = () => {
-  const { adminLogin } = useAuth();
+  const { adminLogin, isAuthenticated, isAdmin, loading: authLoading } = useAuth();
   const { addToast } = useToast();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Auto-redirect if already authenticated as Admin
+  useEffect(() => {
+    if (!authLoading && isAuthenticated && isAdmin) {
+      navigate('/admin/dashboard', { replace: true });
+    }
+  }, [isAuthenticated, isAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,6 +40,10 @@ const AdminLogin = () => {
     setEmail('admin@toystore.com');
     setPassword('AdminPassword123!');
   };
+
+  if (authLoading) {
+    return <Loader fullScreen text="Checking existing admin session..." />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 py-12">

@@ -17,15 +17,18 @@ if (rawUrl.startsWith('http') && !rawUrl.endsWith('/api')) {
 
 const api = axios.create({
   baseURL: rawUrl,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request Interceptor: Attach token if logged in
+// Request Interceptor: Ensure withCredentials and attach auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    config.withCredentials = true;
+    const adminToken = localStorage.getItem('admin_token');
+    const token = adminToken || localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

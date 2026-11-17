@@ -74,7 +74,8 @@ const Navbar = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-gradient-to-r from-[#FF6B9A] to-[#A855F7] backdrop-blur-md border-b border-white/20 shadow-md transition-all">
+    <>
+      <header className="fixed top-0 left-0 right-0 z-40 w-full bg-gradient-to-r from-[#FF6B9A] to-[#A855F7] backdrop-blur-md border-b border-white/20 shadow-md transition-all">
       {/* Top Subtle Shimmer Highlight Ribbon */}
       <div className="h-0.5 bg-gradient-to-r from-white/30 via-white/80 to-white/30 w-full" />
 
@@ -432,6 +433,10 @@ const Navbar = () => {
         )}
       </AnimatePresence>
     </header>
+
+    {/* Spacer to prevent page content from being hidden behind fixed navbar */}
+    <div className="h-[108px] md:h-20 w-full flex-shrink-0" aria-hidden="true" />
+  </>
   );
 };
 

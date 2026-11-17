@@ -23,7 +23,7 @@ export const AdminRoute = ({ children }) => {
   const location = useLocation();
 
   if (loading) {
-    return <Loader fullScreen />;
+    return <Loader fullScreen text="Verifying secure admin session..." />;
   }
 
   if (!isAuthenticated || !isAdmin) {

@@ -23,9 +23,9 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
-    navigate('/admin/login');
+  const handleLogout = async () => {
+    await logout();
+    navigate('/admin/login', { replace: true });
   };
 
   const navItems = [
@@ -127,11 +127,9 @@ const AdminLayout = () => {
           {/* User profile card & Logout */}
           <div className="pt-2 flex items-center justify-between">
             <div className="flex items-center gap-2.5 truncate">
-              <img
-                src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
-                alt={user?.name}
-                className="w-8 h-8 rounded-full object-cover ring-2 ring-pink-500 flex-shrink-0"
-              />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black flex items-center justify-center text-xs ring-2 ring-pink-500/50 flex-shrink-0">
+                {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+              </div>
               <div className="truncate">
                 <p className="text-xs font-bold text-white truncate">{user?.name}</p>
                 <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>

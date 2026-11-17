@@ -1,6 +1,17 @@
 import User from '../models/User.js';
 import generateToken from '../utils/generateToken.js';
 
+export const getCookieOptions = () => {
+  const isProduction = process.env.NODE_ENV === 'production';
+  return {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days persistent session
+    path: '/',
+  };
+};
+
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -25,6 +36,10 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
+      const token = generateToken(user._id);
+      const cookieOptions = getCookieOptions();
+      res.cookie('token', token, cookieOptions);
+
       res.status(201).json({
         _id: user._id,
         name: user.name,
@@ -32,7 +47,7 @@ export const registerUser = async (req, res) => {
         role: user.role,
         phone: user.phone,
         avatar: user.avatar,
-        token: generateToken(user._id),
+        token,
       });
     } else {
       res.status(400).json({ message: 'Invalid user data' });
@@ -78,6 +93,10 @@ export const loginUser = async (req, res) => {
         role: 'user',
       });
 
+      const token = generateToken(user._id);
+      const cookieOptions = getCookieOptions();
+      res.cookie('token', token, cookieOptions);
+
       return res.status(201).json({
         _id: user._id,
         name: user.name,
@@ -85,7 +104,7 @@ export const loginUser = async (req, res) => {
         role: user.role,
         phone: user.phone,
         avatar: user.avatar,
-        token: generateToken(user._id),
+        token,
         isNewUser: true,
         message: 'Account created and logged in successfully!',
       });
@@ -93,6 +112,13 @@ export const loginUser = async (req, res) => {
 
     // Existing user: check password
     if (await user.matchPassword(password)) {
+      const token = generateToken(user._id);
+      const cookieOptions = getCookieOptions();
+      res.cookie('token', token, cookieOptions);
+      if (user.role === 'admin') {
+        res.cookie('adminToken', token, cookieOptions);
+      }
+
       return res.json({
         _id: user._id,
         name: user.name,
@@ -100,7 +126,7 @@ export const loginUser = async (req, res) => {
         role: user.role,
         phone: user.phone,
         avatar: user.avatar,
-        token: generateToken(user._id),
+        token,
       });
     } else {
       return res.status(401).json({ message: 'Invalid password. Please check and try again.' });
@@ -132,6 +158,11 @@ export const adminLogin = async (req, res) => {
     }
 
     if (await user.matchPassword(password)) {
+      const token = generateToken(user._id);
+      const cookieOptions = getCookieOptions();
+      res.cookie('adminToken', token, cookieOptions);
+      res.cookie('token', token, cookieOptions);
+
       res.json({
         _id: user._id,
         name: user.name,
@@ -139,7 +170,7 @@ export const adminLogin = async (req, res) => {
         role: user.role,
         phone: user.phone,
         avatar: user.avatar,
-        token: generateToken(user._id),
+        token,
       });
     } else {
       res.status(401).json({ message: 'Invalid email or password' });
@@ -253,6 +284,54 @@ export const uploadAvatar = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: error.message || 'Error uploading photo from local disk' });
+  }
+};
+
+// @desc    Verify active admin session via HTTP-only cookie
+// @route   GET /api/auth/verify-admin-session
+// @access  Private / Admin
+export const verifyAdminSession = async (req, res) => {
+  try {
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({
+        authenticated: false,
+        message: 'Access denied: Administrator privileges required',
+      });
+    }
+
+    res.json({
+      authenticated: true,
+      user: {
+        _id: req.user._id,
+        name: req.user.name,
+        email: req.user.email,
+        role: req.user.role,
+        phone: req.user.phone,
+        avatar: req.user.avatar,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ authenticated: false, message: error.message });
+  }
+};
+
+// @desc    Clear authentication cookies and terminate session
+// @route   POST /api/auth/logout
+// @access  Public
+export const logoutUser = async (req, res) => {
+  try {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const clearOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      path: '/',
+    };
+    res.clearCookie('adminToken', clearOptions);
+    res.clearCookie('token', clearOptions);
+    res.json({ success: true, message: 'Logged out successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 

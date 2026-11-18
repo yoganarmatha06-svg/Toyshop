@@ -109,10 +109,11 @@ const startServer = async () => {
   try {
     await connectDB();
 
-    // Auto-seed if category catalog is not restored to the original 10 categories
+    // Auto-seed ONLY if database is completely uninitialized (0 categories AND 0 products)
     const catCount = await Category.countDocuments();
-    if (catCount !== 10) {
-      console.log(' Restoring original 10-category store catalogue...');
+    const prodCount = await Product.countDocuments();
+    if (catCount === 0 && prodCount === 0) {
+      console.log(' Fresh database detected. Initializing store catalogue...');
       await seedDatabase();
     }
 

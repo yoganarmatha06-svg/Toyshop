@@ -13,50 +13,47 @@ import { connectDB } from '../config/db.js';
 
 dotenv.config();
 
-export const seedDatabase = async () => {
+export const seedDatabase = async ({ force = false } = {}) => {
   try {
-    console.log(' Starting database seed process for full 10-category catalogue...');
+    console.log(' Checking database store catalogue...');
 
-    // Clear existing collections
-    await User.deleteMany();
-    await Category.deleteMany();
-    await Product.deleteMany();
-    await Order.deleteMany();
-    await Review.deleteMany();
-    await Address.deleteMany();
-    await Cart.deleteMany();
-    await Wishlist.deleteMany();
+    if (force) {
+      console.warn('⚠️ Force reset requested: clearing product/category catalogue...');
+      await Category.deleteMany();
+      await Product.deleteMany();
+      await Review.deleteMany();
+    }
 
-    console.log(' Cleared previous collections');
-
-    // 1. Create Users
-    const salt = await bcrypt.genSalt(10);
-    const adminPassword = await bcrypt.hash('AdminPassword123!', salt);
-    const userPassword = await bcrypt.hash('UserPassword123!', salt);
-
-    const users = await User.insertMany([
-      {
+    // 1. Create or retrieve Admin & Demo users without wiping registered customer accounts
+    let adminUser = await User.findOne({ email: 'admin@toystore.com' });
+    if (!adminUser) {
+      const salt = await bcrypt.genSalt(10);
+      const adminPassword = await bcrypt.hash('AdminPassword123!', salt);
+      adminUser = await User.create({
         name: 'Store Administrator',
         email: 'admin@toystore.com',
         password: adminPassword,
         role: 'admin',
         phone: '+91 9876543210',
         avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=250&q=80',
-      },
-      {
+      });
+      console.log(' Created Admin user (admin@toystore.com)');
+    }
+
+    let demoUser = await User.findOne({ email: 'user@toystore.com' });
+    if (!demoUser) {
+      const salt = await bcrypt.genSalt(10);
+      const userPassword = await bcrypt.hash('UserPassword123!', salt);
+      demoUser = await User.create({
         name: 'Aarav Sharma',
         email: 'user@toystore.com',
         password: userPassword,
         role: 'user',
         phone: '+91 9812345678',
         avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=250&q=80',
-      },
-    ]);
-
-    const adminUser = users[0];
-    const demoUser = users[1];
-
-    console.log(' Created Admin & Demo users');
+      });
+      console.log(' Created Demo user (user@toystore.com)');
+    }
 
     // 2. Create the 10 Categories
     const categoriesData = [
@@ -132,13 +129,15 @@ export const seedDatabase = async () => {
       },
     ];
 
-    const savedCategories = await Category.insertMany(categoriesData);
+    let savedCategories = await Category.find({});
+    if (savedCategories.length === 0) {
+      savedCategories = await Category.insertMany(categoriesData);
+      console.log(` Seeded ${savedCategories.length} Categories`);
+    }
     const catMap = {};
     savedCategories.forEach((c) => {
       catMap[c.name] = c._id;
     });
-
-    console.log(` Seeded ${savedCategories.length} Categories`);
 
     // 3. Create Products across the 10 Categories
     const productsData = [
@@ -407,125 +406,140 @@ export const seedDatabase = async () => {
       },
     ];
 
-    const savedProducts = await Product.insertMany(productsData);
-    console.log(` Seeded ${savedProducts.length} Products across all 10 categories`);
+    let savedProducts = await Product.find({});
+    if (savedProducts.length === 0) {
+      savedProducts = await Product.insertMany(productsData);
+      console.log(` Seeded ${savedProducts.length} Products across all 10 categories`);
+    }
 
-    // 4. Create Sample Address for Demo User
-    await Address.create({
-      user: demoUser._id,
-      fullName: 'Aarav Sharma',
-      phoneNumber: '+91 9812345678',
-      streetAddress: '42, Lotus Boulevard, Sector 100',
-      city: 'Noida',
-      state: 'Uttar Pradesh',
-      postalCode: '201304',
-      country: 'India',
-      isDefault: true,
-    });
-
-    console.log(' Seeded Demo Address');
-
-    // 5. Create Sample Orders for Demo User
-    await Order.create([
-      {
+    // 4. Create Sample Address for Demo User if not exists
+    const hasAddress = await Address.findOne({ user: demoUser._id });
+    if (!hasAddress) {
+      await Address.create({
         user: demoUser._id,
-        orderItems: [
-          {
-            product: savedProducts[0]._id,
-            name: savedProducts[0].name,
-            image: savedProducts[0].productImages[0],
-            price: savedProducts[0].discountPrice,
-            quantity: 1,
+        fullName: 'Aarav Sharma',
+        phoneNumber: '+91 9812345678',
+        streetAddress: '42, Lotus Boulevard, Sector 100',
+        city: 'Noida',
+        state: 'Uttar Pradesh',
+        postalCode: '201304',
+        country: 'India',
+        isDefault: true,
+      });
+      console.log(' Seeded Demo Address');
+    }
+
+    // 5. Create Sample Orders ONLY if 0 orders exist in database
+    const orderCount = await Order.countDocuments();
+    if (orderCount === 0 && savedProducts.length > 0) {
+      await Order.create([
+        {
+          user: demoUser._id,
+          orderItems: [
+            {
+              product: savedProducts[0]._id,
+              name: savedProducts[0].name,
+              image: savedProducts[0].productImages[0],
+              price: savedProducts[0].discountPrice,
+              quantity: 1,
+            },
+            {
+              product: savedProducts[6]._id,
+              name: savedProducts[6].name,
+              image: savedProducts[6].productImages[0],
+              price: savedProducts[6].discountPrice,
+              quantity: 1,
+            },
+          ],
+          shippingAddress: {
+            fullName: 'Aarav Sharma',
+            phoneNumber: '+91 9812345678',
+            streetAddress: '42, Lotus Boulevard, Sector 100',
+            city: 'Noida',
+            state: 'Uttar Pradesh',
+            postalCode: '201304',
+            country: 'India',
           },
-          {
-            product: savedProducts[6]._id,
-            name: savedProducts[6].name,
-            image: savedProducts[6].productImages[0],
-            price: savedProducts[6].discountPrice,
-            quantity: 1,
+          paymentMethod: 'Razorpay',
+          paymentResult: {
+            id: 'pay_demo_1001',
+            status: 'COMPLETED',
+            razorpay_order_id: 'order_demo_1001',
+            razorpay_payment_id: 'pay_demo_1001',
           },
-        ],
-        shippingAddress: {
-          fullName: 'Aarav Sharma',
-          phoneNumber: '+91 9812345678',
-          streetAddress: '42, Lotus Boulevard, Sector 100',
-          city: 'Noida',
-          state: 'Uttar Pradesh',
-          postalCode: '201304',
-          country: 'India',
+          itemsPrice: 4098,
+          shippingPrice: 0,
+          taxPrice: 205,
+          totalPrice: 4303,
+          isPaid: true,
+          paidAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+          orderStatus: 'Delivered',
+          deliveredAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
         },
-        paymentMethod: 'Razorpay',
-        paymentResult: {
-          id: 'pay_demo_1001',
-          status: 'COMPLETED',
-          razorpay_order_id: 'order_demo_1001',
-          razorpay_payment_id: 'pay_demo_1001',
-        },
-        itemsPrice: 4098,
-        shippingPrice: 0,
-        taxPrice: 205,
-        totalPrice: 4303,
-        isPaid: true,
-        paidAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-        orderStatus: 'Delivered',
-        deliveredAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      },
-      {
-        user: demoUser._id,
-        orderItems: [
-          {
-            product: savedProducts[2]._id,
-            name: savedProducts[2].name,
-            image: savedProducts[2].productImages[0],
-            price: savedProducts[2].discountPrice,
-            quantity: 1,
+        {
+          user: demoUser._id,
+          orderItems: [
+            {
+              product: savedProducts[2]._id,
+              name: savedProducts[2].name,
+              image: savedProducts[2].productImages[0],
+              price: savedProducts[2].discountPrice,
+              quantity: 1,
+            },
+          ],
+          shippingAddress: {
+            fullName: 'Aarav Sharma',
+            phoneNumber: '+91 9812345678',
+            streetAddress: '42, Lotus Boulevard, Sector 100',
+            city: 'Noida',
+            state: 'Uttar Pradesh',
+            postalCode: '201304',
+            country: 'India',
           },
-        ],
-        shippingAddress: {
-          fullName: 'Aarav Sharma',
-          phoneNumber: '+91 9812345678',
-          streetAddress: '42, Lotus Boulevard, Sector 100',
-          city: 'Noida',
-          state: 'Uttar Pradesh',
-          postalCode: '201304',
-          country: 'India',
+          paymentMethod: 'Razorpay',
+          paymentResult: {
+            id: 'pay_demo_1002',
+            status: 'COMPLETED',
+            razorpay_order_id: 'order_demo_1002',
+            razorpay_payment_id: 'pay_demo_1002',
+          },
+          itemsPrice: 1999,
+          shippingPrice: 0,
+          taxPrice: 100,
+          totalPrice: 2099,
+          isPaid: true,
+          paidAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+          orderStatus: 'Shipped',
         },
-        paymentMethod: 'Razorpay',
-        paymentResult: {
-          id: 'pay_demo_1002',
-          status: 'COMPLETED',
-          razorpay_order_id: 'order_demo_1002',
-          razorpay_payment_id: 'pay_demo_1002',
+      ]);
+      console.log(' Seeded initial demo orders');
+    } else {
+      console.log(` Preserving all existing customer orders (${orderCount} orders in database)`);
+    }
+
+    // 6. Create Sample Reviews ONLY if 0 reviews exist
+    const reviewCount = await Review.countDocuments();
+    if (reviewCount === 0 && savedProducts.length > 0) {
+      await Review.create([
+        {
+          user: demoUser._id,
+          product: savedProducts[0]._id,
+          rating: 5,
+          title: 'Adorable & Super Soft!',
+          comment: 'My niece absolutely loved this giant bear! Stitching is high quality and fur is so fluffy.',
         },
-        itemsPrice: 1999,
-        shippingPrice: 0,
-        taxPrice: 100,
-        totalPrice: 2099,
-        isPaid: true,
-        paidAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-        orderStatus: 'Shipped',
-      },
-    ]);
+        {
+          user: demoUser._id,
+          product: savedProducts[6]._id,
+          rating: 5,
+          title: 'Outstanding Lego set!',
+          comment: 'The details on the spaceship are incredible. Kept my 10-year-old engaged for hours.',
+        },
+      ]);
+      console.log(' Seeded initial reviews');
+    }
 
-    // 6. Create Sample Reviews
-    await Review.create([
-      {
-        user: demoUser._id,
-        product: savedProducts[0]._id,
-        rating: 5,
-        title: 'Adorable & Super Soft!',
-        comment: 'My niece absolutely loved this giant bear! Stitching is high quality and fur is so fluffy.',
-      },
-      {
-        user: demoUser._id,
-        product: savedProducts[6]._id,
-        rating: 5,
-        title: 'Outstanding Lego set!',
-        comment: 'The details on the spaceship are incredible. Kept my 10-year-old engaged for hours.',
-      },
-    ]);
-
-    console.log(' Database seed completed successfully!');
+    console.log(' Database catalogue check completed successfully!');
     return true;
   } catch (error) {
     console.error(' Error seeding database:', error);
@@ -537,7 +551,8 @@ export const seedDatabase = async () => {
 if (process.argv[1] && process.argv[1].endsWith('seedData.js')) {
   (async () => {
     await connectDB();
-    await seedDatabase();
+    const force = process.argv.includes('--force');
+    await seedDatabase({ force });
     process.exit(0);
   })();
 }

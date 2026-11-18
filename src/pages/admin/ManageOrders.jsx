@@ -146,9 +146,11 @@ const ManageOrders = () => {
                     </td>
 
                     <td className="py-4 px-4">
-                      <p className="font-bold text-slate-800">{order.user?.name || 'Customer'}</p>
+                      <p className="font-bold text-slate-800">
+                        {order.user?.name || order.shippingAddress?.fullName || 'Customer'}
+                      </p>
                       <p className="text-[10px] text-slate-400 truncate max-w-[140px]">
-                        {order.user?.email}
+                        {order.user?.email || order.shippingAddress?.phoneNumber || ''}
                       </p>
                     </td>
 
@@ -269,7 +271,12 @@ const ManageOrders = () => {
               <p className="font-bold text-pink-900 flex items-center gap-1.5">
                 <MapPin className="w-3.5 h-3.5 text-pink-600" /> Delivery Address
               </p>
-              <p className="text-slate-800 font-bold">{selectedOrder.shippingAddress?.fullName}</p>
+              <p className="text-slate-800 font-bold">
+                {selectedOrder.shippingAddress?.fullName || selectedOrder.user?.name || 'Customer'}
+              </p>
+              {selectedOrder.user?.email && (
+                <p className="text-slate-500 text-[11px]">✉️ {selectedOrder.user.email}</p>
+              )}
               <p className="text-slate-600 leading-relaxed">
                 {[
                   selectedOrder.shippingAddress?.houseFlatNo,

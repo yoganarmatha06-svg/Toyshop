@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   LogOut,
   Home as HomeIcon,
+  Info,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -75,6 +76,19 @@ const Navbar = () => {
     { name: 'About', path: '/about' },
   ];
 
+  const isLinkActive = (path) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    if (path === '/shop?sort=popular') {
+      return location.pathname === '/shop' && location.search.includes('sort=popular');
+    }
+    if (path === '/shop') {
+      return location.pathname === '/shop' && !location.search.includes('sort=popular');
+    }
+    return location.pathname === path;
+  };
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-40 w-full bg-gradient-to-r from-[#FF6B9A] to-[#A855F7] backdrop-blur-md border-b border-white/20 shadow-md transition-all">
@@ -94,21 +108,22 @@ const Navbar = () => {
 
           {/* Desktop Nav Links Pill Container */}
           <nav className="hidden md:flex items-center gap-1.5 lg:gap-2 bg-white/15 backdrop-blur-md p-1.5 rounded-full border border-white/25 shadow-inner">
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.name}
-                to={link.path}
-                className={({ isActive }) =>
-                  `font-nav text-[15px] lg:text-[16px] font-bold px-4 py-1.5 rounded-full tracking-wide transition-all duration-200 ${
-                    isActive
+            {navLinks.map((link) => {
+              const active = isLinkActive(link.path);
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`font-nav text-[15px] lg:text-[16px] font-bold px-4 py-1.5 rounded-full tracking-wide transition-all duration-200 ${
+                    active
                       ? 'bg-white text-[#A855F7] font-extrabold shadow-sm'
                       : 'text-white/90 hover:text-white hover:bg-white/20'
-                  }`
-                }
-              >
-                {link.name}
-              </NavLink>
-            ))}
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Actions & Profile */}
@@ -330,26 +345,27 @@ const Navbar = () => {
 
                 {/* Nav Links */}
                 <div className="flex flex-col space-y-1.5 font-heading">
-                  {navLinks.map((link) => (
-                    <NavLink
-                      key={link.name}
-                      to={link.path}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className={({ isActive }) =>
-                        `min-h-[44px] flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-base font-bold transition-all ${
-                          isActive
+                  {navLinks.map((link) => {
+                    const active = isLinkActive(link.path);
+                    return (
+                      <Link
+                        key={link.name}
+                        to={link.path}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`min-h-[44px] flex items-center gap-3 py-2.5 px-3.5 rounded-xl text-base font-bold transition-all ${
+                          active
                             ? 'bg-white text-[#A855F7] shadow-sm font-black'
                             : 'text-white/95 hover:bg-white/15'
-                        }`
-                      }
-                    >
-                      {link.name === 'Home' && <HomeIcon className="w-5 h-5" />}
-                      {(link.name === 'Our Toys' || link.name === 'Our Toy' || link.name === 'Shop All Toys') && <ShoppingBag className="w-5 h-5" />}
-                      {link.name === 'Best Sellers' && <PackageCheck className="w-5 h-5" />}
-                      {link.name === 'About Us' && <Sparkles className="w-5 h-5" />}
-                      <span>{link.name}</span>
-                    </NavLink>
-                  ))}
+                        }`}
+                      >
+                        {link.name === 'Home' && <HomeIcon className="w-5 h-5" />}
+                        {(link.name === 'Our Toys' || link.name === 'Our Toy' || link.name === 'Shop All Toys') && <ShoppingBag className="w-5 h-5" />}
+                        {link.name === 'Best Sellers' && <PackageCheck className="w-5 h-5" />}
+                        {(link.name === 'About' || link.name === 'About Us') && <Info className="w-5 h-5" />}
+                        <span>{link.name}</span>
+                      </Link>
+                    );
+                  })}
 
                   <NavLink
                     to="/wishlist"

@@ -1,5 +1,8 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import { MongoMemoryServer } from 'mongodb-memory-server';
+
+dotenv.config();
 
 let mongodInstance = null;
 
@@ -16,7 +19,7 @@ export const connectDB = async () => {
 
     try {
       const conn = await mongoose.connect(formattedUri, {
-        serverSelectionTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 20000,
       });
       console.log(` MongoDB Connected to specified URI: ${conn.connection.host}`);
       return conn;

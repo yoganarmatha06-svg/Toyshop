@@ -23,16 +23,21 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'Please provide name, email, and password' });
     }
 
-    const userExists = await User.findOne({ email: email.toLowerCase() });
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters long' });
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists with this email' });
+      return res.status(400).json({ message: 'An account already exists with this email. Please log in.' });
     }
 
     const user = await User.create({
-      name,
-      email: email.toLowerCase(),
+      name: name.trim(),
+      email: normalizedEmail,
       password,
-      phone: phone || '',
+      phone: phone ? phone.trim() : '',
     });
 
     if (user) {
@@ -57,80 +62,65 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// @desc    Authenticate user & get token (Auto-processes & stores new users in MongoDB)
+// @desc    Authenticate user & get token (Requires registered user in database and password verification)
 // @route   POST /api/auth/login
 // @access  Public
 export const loginUser = async (req, res) => {
   try {
-    const { email, password, name, phone } = req.body;
+    const { email, password, username } = req.body;
 
-    if (!email || !password) {
+    const identifier = (email || username || '').trim();
+
+    if (!identifier || !password) {
       return res.status(400).json({ message: 'Please provide email and password' });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-    let user = await User.findOne({ email: normalizedEmail });
-
-    // If new user logs in, process in backend and store in MongoDB database!
-    if (!user) {
-      if (password.length < 6) {
-        return res.status(400).json({ message: 'Password must be at least 6 characters long' });
-      }
-
-      // Generate a user-friendly name from email if not provided (e.g. "priya.sharma@gmail.com" -> "Priya Sharma")
-      const derivedName =
-        name?.trim() ||
-        normalizedEmail
-          .split('@')[0]
-          .replace(/[._-]+/g, ' ')
-          .replace(/\b\w/g, (c) => c.toUpperCase());
-
-      user = await User.create({
-        name: derivedName || 'Toy World Customer',
-        email: normalizedEmail,
-        password, // pre('save') hook will hash with bcrypt
-        phone: phone?.trim() || '',
-        role: 'user',
-      });
-
-      const token = generateToken(user._id);
-      const cookieOptions = getCookieOptions();
-      res.cookie('token', token, cookieOptions);
-
-      return res.status(201).json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        phone: user.phone,
-        avatar: user.avatar,
-        token,
-        isNewUser: true,
-        message: 'Account created and logged in successfully!',
-      });
-    }
-
-    // Existing user: check password
-    if (await user.matchPassword(password)) {
-      const token = generateToken(user._id);
-      const cookieOptions = getCookieOptions();
-      res.cookie('token', token, cookieOptions);
-      if (user.role === 'admin') {
-        res.cookie('adminToken', token, cookieOptions);
-      }
-
-      return res.json({
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        phone: user.phone,
-        avatar: user.avatar,
-        token,
-      });
+    // 1. Search in MongoDB database for registered user (by email or username/name)
+    let user = null;
+    if (identifier.includes('@')) {
+      user = await User.findOne({ email: identifier.toLowerCase() });
     } else {
-      return res.status(401).json({ message: 'Invalid password. Please check and try again.' });
+      user = await User.findOne({
+        $or: [
+          { email: identifier.toLowerCase() },
+          { name: { $regex: new RegExp(`^${identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } },
+        ],
+      });
     }
+
+    // 2. Reject login if user is NOT created/registered in database (Do NOT auto-create!)
+    if (!user) {
+      return res.status(401).json({
+        message: 'No account found with this email/username. Please register or create an account first.',
+      });
+    }
+
+    // 3. Verify password against hashed password in database
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({
+        message: 'Invalid password. Please check your password and try again.',
+      });
+    }
+
+    // 4. Issue session token upon verified authentication
+    const token = generateToken(user._id);
+    const cookieOptions = getCookieOptions();
+    res.cookie('token', token, cookieOptions);
+    if (user.role === 'admin') {
+      res.cookie('adminToken', token, cookieOptions);
+    }
+
+    return res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      phone: user.phone,
+      avatar: user.avatar,
+      token,
+      message: 'Logged in successfully',
+    });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Server error' });
   }

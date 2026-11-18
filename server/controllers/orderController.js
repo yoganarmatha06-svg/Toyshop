@@ -133,7 +133,8 @@ export const getOrderById = async (req, res) => {
     }
 
     // Authorize: owner or admin
-    if (order.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+    const orderUserId = order.user?._id ? order.user._id.toString() : order.user?.toString();
+    if (orderUserId && orderUserId !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to view this order' });
     }
 
@@ -192,7 +193,7 @@ export const updateOrderToPaid = async (req, res) => {
 // @access  Private/Admin
 export const getAllOrders = async (req, res) => {
   try {
-    const pageSize = Number(req.query.limit) || 20;
+    const pageSize = Number(req.query.limit) || 50;
     const page = Number(req.query.page) || 1;
     const status = req.query.status;
 
@@ -203,7 +204,7 @@ export const getAllOrders = async (req, res) => {
 
     const count = await Order.countDocuments(query);
     const orders = await Order.find(query)
-      .populate('user', 'name email')
+      .populate('user', 'name email phone')
       .sort({ createdAt: -1 })
       .limit(pageSize)
       .skip(pageSize * (page - 1));

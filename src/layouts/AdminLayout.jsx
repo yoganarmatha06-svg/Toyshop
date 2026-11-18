@@ -62,20 +62,20 @@ const AdminLayout = () => {
   return (
     <div className="min-h-screen bg-slate-100/70 flex flex-col md:flex-row">
       {/* Mobile Header */}
-      <div className="md:hidden bg-slate-900 text-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-50 border-b border-slate-800">
+      <div className="md:hidden bg-[#30204F] text-white px-4 py-2.5 flex items-center justify-between sticky top-0 z-50 border-b border-[#442E6E]">
         <Link to="/admin/dashboard" className="flex items-center gap-2">
           <img
             src={toyLogo}
             alt="Toy World Admin"
             className="h-10 w-auto object-contain select-none"
           />
-          <span className="text-[10px] font-bold font-heading text-amber-400 uppercase tracking-wider px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700">
+          <span className="text-[10px] font-bold font-heading text-pink-300 uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#3D2963] border border-[#523884]">
             Admin
           </span>
         </Link>
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="p-2 rounded-lg bg-slate-800 text-slate-200 cursor-pointer"
+          className="p-2 rounded-lg bg-[#3D2963] text-pink-200 hover:text-white cursor-pointer transition-colors"
           aria-label="Toggle admin menu"
         >
           {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -93,25 +93,25 @@ const AdminLayout = () => {
 
       {/* Permanently Fixed Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 md:z-40 w-64 h-screen bg-slate-900 text-slate-300 flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-50 md:z-40 w-64 h-screen bg-[#30204F] text-white flex flex-col transition-transform duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } md:translate-x-0 shadow-2xl md:shadow-none select-none`}
       >
         {/* Brand */}
-        <div className="shrink-0 p-4 border-b border-slate-800 flex items-center justify-between relative">
+        <div className="shrink-0 p-4 border-b border-[#442E6E] flex items-center justify-between relative">
           <Link to="/admin/dashboard" className="flex flex-col items-center mx-auto group">
             <img
               src={toyLogo}
               alt="Toy World Admin"
               className="h-16 w-auto object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-md select-none"
             />
-            <span className="text-[10px] font-extrabold text-amber-400 uppercase tracking-widest flex items-center gap-1 font-heading mt-1 bg-slate-800/90 px-2.5 py-0.5 rounded-md border border-slate-700">
-              <Shield className="w-2.5 h-2.5 text-amber-400" /> Admin Control
+            <span className="text-[10px] font-extrabold text-pink-300 uppercase tracking-widest flex items-center gap-1 font-heading mt-1 bg-[#3D2963] px-2.5 py-0.5 rounded-md border border-[#523884]">
+              <Shield className="w-2.5 h-2.5 text-pink-300" /> Admin Control
             </span>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="md:hidden text-slate-400 hover:text-white absolute top-4 right-4 p-1 rounded-lg hover:bg-slate-800 transition-colors"
+            className="md:hidden text-[#E9D5FF] hover:text-white absolute top-4 right-4 p-1 rounded-lg hover:bg-[#3D2963] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -128,56 +128,61 @@ const AdminLayout = () => {
                 key={item.name}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={`group flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                className={`group relative flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all duration-300 ease-in-out cursor-pointer ${
                   active
-                    ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md shadow-pink-500/25 ring-1 ring-white/10'
-                    : 'text-slate-400 bg-transparent hover:bg-pink-500/15 hover:text-pink-200'
+                    ? 'bg-[#E84A91] text-white shadow-md shadow-[#E84A91]/30 ring-1 ring-white/10'
+                    : 'text-white bg-transparent hover:bg-[#46286B] hover:text-white'
                 }`}
               >
+                {/* Subtle Pink Left Indicator for Active Menu */}
+                {active && (
+                  <span className="absolute left-1.5 top-2.5 bottom-2.5 w-1 rounded-full bg-pink-200 shadow-xs" />
+                )}
                 <Icon
-                  className={`w-4 h-4 flex-shrink-0 transition-colors ${
-                    active ? 'text-white' : 'text-slate-400 group-hover:text-pink-300'
+                  className={`w-4 h-4 flex-shrink-0 transition-colors duration-300 ${
+                    active
+                      ? 'text-white'
+                      : 'text-[#E9D5FF] group-hover:text-pink-200'
                   }`}
                 />
-                <span>{item.name}</span>
+                <span className={active ? 'ml-0.5' : ''}>{item.name}</span>
               </Link>
             );
           })}
         </nav>
 
         {/* Quick Back to Store */}
-        <div className="shrink-0 p-4 border-t border-slate-800 space-y-2">
+        <div className="shrink-0 p-4 border-t border-[#442E6E] space-y-2.5">
           <Link
             to="/"
             target="_blank"
-            className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+            className="flex items-center justify-between w-full px-4 py-2.5 rounded-xl bg-[#3D2963] hover:bg-[#483175] text-xs font-semibold text-[#E9D5FF] hover:text-white border border-[#523884] transition-all duration-300"
           >
             <span className="flex items-center gap-2">
-              <Eye className="w-3.5 h-3.5 text-amber-400" /> View Live Store
+              <Eye className="w-3.5 h-3.5 text-pink-400" /> View Live Store
             </span>
-            <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+            <ExternalLink className="w-3.5 h-3.5 text-[#E9D5FF]" />
           </Link>
 
-          {/* Admin profile card & Logout */}
-          <div className="pt-2 flex items-center justify-between">
-            <div className="flex items-center gap-2.5 truncate">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-slate-900 font-black flex items-center justify-center text-xs ring-2 ring-amber-400/40 flex-shrink-0">
-                A
-              </div>
-              <div className="truncate">
-                <p className="text-xs font-bold text-white truncate">Admin</p>
-                <p className="text-[10px] text-amber-400/90 font-medium truncate">admin@toystore.com</p>
-              </div>
+          {/* Admin profile card */}
+          <div className="pt-1 flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-400 to-[#E84A91] text-white font-black flex items-center justify-center text-xs ring-2 ring-pink-400/40 flex-shrink-0">
+              A
             </div>
-
-            <button
-              onClick={handleLogout}
-              title="Logout from Admin Portal"
-              className="p-2 text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
+            <div className="truncate">
+              <p className="text-xs font-bold text-white truncate">Admin</p>
+              <p className="text-[10px] text-[#E9D5FF]/80 font-medium truncate">admin@toystore.com</p>
+            </div>
           </div>
+
+          {/* Fixed Color Sidebar Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-colors duration-200 cursor-pointer shadow-md shadow-rose-950/40 active:scale-98"
+          >
+            <LogOut className="w-4 h-4 text-white" />
+            <span className="text-white">Logout</span>
+          </button>
         </div>
       </aside>
 

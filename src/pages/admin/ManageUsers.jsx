@@ -85,19 +85,9 @@ const ManageUsers = () => {
                 {users.map((u) => (
                   <tr key={u._id} className="hover:bg-slate-50/50 transition-colors">
                     <td className="py-4 px-6">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={
-                            u.avatar ||
-                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80'
-                          }
-                          alt={u.name}
-                          className="w-10 h-10 rounded-full object-cover ring-2 ring-pink-100 flex-shrink-0"
-                        />
-                        <div>
-                          <p className="font-bold text-slate-900">{u.name}</p>
-                          <p className="text-[10px] text-slate-400">{u.email}</p>
-                        </div>
+                      <div>
+                        <p className="font-bold text-slate-900">{u.name}</p>
+                        <p className="text-[10px] text-slate-400">{u.email}</p>
                       </div>
                     </td>
 

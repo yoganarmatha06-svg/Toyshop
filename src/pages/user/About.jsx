@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import {
+  ArrowLeft,
   Sparkles,
   ShieldCheck,
   Truck,
@@ -49,9 +50,21 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-50/40 via-white to-purple-50/30 py-8 sm:py-14">
+    <div className="min-h-screen bg-gradient-to-b from-pink-50/40 via-white to-purple-50/30 py-6 sm:py-12">
       {/* Main Container */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 sm:space-y-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-10">
+        {/* Back to Home Button */}
+        <div className="flex items-center">
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-pink-50 text-slate-900 hover:text-pink-600 text-xs sm:text-sm font-extrabold transition-all border-2 border-slate-900 shadow-sm hover:shadow-md active:scale-95 group cursor-pointer"
+            aria-label="Back to Home"
+          >
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1 text-slate-900 group-hover:text-pink-600" />
+            <span>Back to Home</span>
+          </Link>
+        </div>
+
         {/* Header / Hero Container Card */}
         <div className="relative overflow-hidden bg-white rounded-3xl p-6 sm:p-12 border-2 border-slate-900 shadow-xl text-center space-y-5">
           {/* Decorative Background Blob */}

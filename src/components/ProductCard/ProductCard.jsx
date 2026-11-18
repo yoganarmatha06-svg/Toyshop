@@ -170,7 +170,7 @@ const ProductCardInner = ({
   <>
     {/* Top Badges (Discount & Featured) */}
     <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-20 flex flex-col gap-1 items-start pointer-events-none">
-      {discountPercent > 0 && (
+      {!isFeaturedSection && !product.isFeatured && discountPercent > 0 && (
         <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 text-[10px] sm:text-xs font-black bg-rose-500 text-white rounded-full shadow-xs">
           {discountPercent}% OFF
         </span>
@@ -265,7 +265,7 @@ const ProductCardInner = ({
             <span className="text-sm sm:text-lg font-extrabold text-slate-900 font-heading">
               ₹{currentPrice.toLocaleString('en-IN')}
             </span>
-            {product.discountPrice > 0 && (
+            {!isFeaturedSection && !product.isFeatured && product.discountPrice > 0 && (
               <span className="text-[10px] sm:text-xs text-slate-500 line-through font-semibold">
                 ₹{originalPrice.toLocaleString('en-IN')}
               </span>
@@ -304,10 +304,14 @@ const ProductCard = ({ product, isFeaturedSection = false }) => {
   const isLiked = isInWishlist(product._id);
   const isOutOfStock = product.stockQuantity <= 0;
 
+  const isFeatured = isFeaturedSection || product.isFeatured;
   const originalPrice = product.price;
-  const currentPrice = product.discountPrice > 0 ? product.discountPrice : product.price;
+  const currentPrice =
+    isFeatured || !(product.discountPrice > 0)
+      ? product.price
+      : product.discountPrice;
   const discountPercent =
-    product.discountPrice > 0
+    !isFeatured && product.discountPrice > 0
       ? Math.round(((originalPrice - product.discountPrice) / originalPrice) * 100)
       : 0;
 

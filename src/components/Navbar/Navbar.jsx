@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  Search,
   ShoppingBag,
   Heart,
   User as UserIcon,
@@ -71,7 +72,7 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'Our Toys', path: '/shop' },
     { name: 'Best Sellers', path: '/shop?sort=popular' },
-    { name: 'About Us', path: '/about' },
+    { name: 'About', path: '/about' },
   ];
 
   return (
@@ -111,16 +112,26 @@ const Navbar = () => {
           </nav>
 
           {/* Actions & Profile */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
+            {/* Search Button */}
+            <Link
+              to="/shop"
+              className="p-2 sm:p-2.5 rounded-full text-white bg-white/15 hover:bg-white/25 border border-white/25 transition-all shadow-2xs hover:scale-105 active:scale-95 flex items-center justify-center flex-shrink-0"
+              aria-label="Search Toys"
+              title="Search Toys"
+            >
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            </Link>
+
             {/* Wishlist Button */}
             <Link
               to="/wishlist"
-              className="relative p-2.5 rounded-full text-white bg-white/15 hover:bg-white/25 border border-white/25 transition-all shadow-2xs hover:scale-105 active:scale-95"
+              className="relative p-2 sm:p-2.5 rounded-full text-white bg-white/15 hover:bg-white/25 border border-white/25 transition-all shadow-2xs hover:scale-105 active:scale-95 flex items-center justify-center flex-shrink-0"
               aria-label="Wishlist"
             >
-              <Heart className="w-5 h-5 fill-white/20 text-white" />
+              <Heart className="w-4 h-4 sm:w-5 sm:h-5 fill-white/20 text-white" />
               {wishlist.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 text-slate-900 text-[11px] font-black rounded-full flex items-center justify-center shadow-md animate-pulse">
+                <span className="absolute -top-1 -right-1 w-4 h-4 sm:w-5 sm:h-5 bg-yellow-400 text-slate-900 text-[10px] sm:text-[11px] font-black rounded-full flex items-center justify-center shadow-md animate-pulse">
                   {wishlist.length}
                 </span>
               )}
@@ -129,27 +140,28 @@ const Navbar = () => {
             {/* Cart Button */}
             <Link
               to="/cart"
-              className="relative flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-[#A855F7] hover:bg-white/95 font-extrabold text-sm shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all"
+              className="relative flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 sm:py-2.5 rounded-full bg-white text-[#A855F7] hover:bg-white/95 font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg hover:scale-105 active:scale-95 transition-all flex-shrink-0"
               aria-label="Cart"
             >
               <ShoppingBag className="w-4 h-4 text-[#A855F7]" />
               <span className="hidden sm:inline">Cart</span>
-              <span className="bg-gradient-to-r from-[#FF6B9A] to-[#A855F7] text-white px-2 py-0.5 rounded-full text-xs font-black min-w-[20px] text-center shadow-2xs">
+              <span className="bg-gradient-to-r from-[#FF6B9A] to-[#A855F7] text-white px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-black min-w-[18px] sm:min-w-[20px] text-center shadow-2xs">
                 {totalItems}
               </span>
             </Link>
 
             {/* User Dropdown / Login */}
             {isAuthenticated ? (
-              <div className="relative" ref={profileRef}>
+              <div className="relative flex-shrink-0" ref={profileRef}>
                 <button
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/15 border border-white/25 hover:bg-white/25 transition-all cursor-pointer text-white shadow-2xs hover:scale-105 active:scale-95"
+                  className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-white/15 border border-white/25 hover:bg-white/25 transition-all cursor-pointer text-white shadow-2xs hover:scale-105 active:scale-95"
+                  aria-label="User Profile"
                 >
                   <div className="w-6 h-6 rounded-full bg-white/25 text-white font-black text-xs flex items-center justify-center flex-shrink-0">
                     {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
-                  <span className="text-xs sm:text-sm font-bold text-white max-w-[120px] truncate">
+                  <span className="hidden sm:inline text-xs sm:text-sm font-bold text-white max-w-[120px] truncate">
                     {user?.name?.split(' ')[0]}
                   </span>
                 </button>
@@ -213,12 +225,14 @@ const Navbar = () => {
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                 <Link
                   to="/login"
-                  className="px-3.5 py-2 text-xs sm:text-sm font-bold text-white hover:bg-white/20 rounded-full transition-colors"
+                  className="p-2 sm:px-3.5 sm:py-2 rounded-full text-white bg-white/15 hover:bg-white/25 border border-white/25 sm:border-transparent transition-all flex items-center gap-1 text-xs sm:text-sm font-bold flex-shrink-0"
+                  aria-label="User Account"
                 >
-                  Log In
+                  <UserIcon className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" />
+                  <span className="hidden sm:inline">Log In</span>
                 </Link>
                 <Link
                   to="/register"
@@ -228,41 +242,37 @@ const Navbar = () => {
                 </Link>
               </div>
             )}
-
-            {/* Mobile Menu Hamburger */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-xl text-white hover:bg-white/20 cursor-pointer"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Directly Visible Mobile Navigation Bar for "Home", "Shop All Toys", "Best Sellers" */}
-      <div className="md:hidden flex items-center gap-2 px-3 py-2 border-t border-white/20 bg-white/10 backdrop-blur-md overflow-x-auto scrollbar-none">
+      {/* Mobile Navigation Menu Bar - Clean 4-Column Grid (No Scroll Needed) */}
+      <nav
+        aria-label="Mobile Navigation Menu"
+        className="md:hidden grid grid-cols-4 gap-1 px-2 py-1.5 border-t border-white/20 bg-white/10 backdrop-blur-md"
+      >
         {navLinks.map((link) => (
           <NavLink
             key={link.name}
             to={link.path}
             className={({ isActive }) =>
-              `text-xs font-bold px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all duration-200 flex-shrink-0 flex items-center gap-1.5 shadow-2xs ${
+              `text-[11px] sm:text-xs font-bold py-1.5 px-1 rounded-full text-center transition-all duration-200 flex items-center justify-center gap-1 truncate shadow-2xs select-none ${
                 isActive
                   ? 'bg-white text-[#A855F7] font-black shadow-sm scale-102'
                   : 'text-white/95 bg-white/20 hover:bg-white/30'
               }`
             }
           >
-            {link.name === 'Home' && '🏠'}
-            {(link.name === 'Our Toys' || link.name === 'Our Toy' || link.name === 'Shop All Toys') && '🧸'}
-            {link.name === 'Best Sellers' && '⭐'}
-            {link.name === 'About Us' && '✨'}
-            <span>{link.name}</span>
+            <span className="text-[12px] flex-shrink-0">
+              {link.name === 'Home' && '🏠'}
+              {(link.name === 'Our Toys' || link.name === 'Our Toy' || link.name === 'Shop All Toys') && '🧸'}
+              {link.name === 'Best Sellers' && '⭐'}
+              {(link.name === 'About' || link.name === 'About Us') && '✨'}
+            </span>
+            <span className="truncate">{link.name}</span>
           </NavLink>
         ))}
-      </div>
+      </nav>
 
       {/* Mobile Drawer Navigation: Smooth slide-in mobile menu */}
       <AnimatePresence>

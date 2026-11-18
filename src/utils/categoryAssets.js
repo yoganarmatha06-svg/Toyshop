@@ -1,10 +1,10 @@
 import buildingBlocksImg from '../assets/bulidingblocks.jpg';
 import babyToyImg from '../assets/babytoy.jpg';
-import boardGamesImg from '../assets/boardgames.jpg';
+import boardGamesImg from '../assets/boared toys.jpg';
 import carsAndVehiclesImg from '../assets/car and vechile.jpg';
 import dollImg from '../assets/doll.jpg';
 import remoteControlImg from '../assets/remote.jpg';
-import outdoorImg from '../assets/outer.jpg';
+import outdoorImg from '../assets/outer copy.jpg';
 import puzzleGameImg from '../assets/puzzle game.png';
 
 /**

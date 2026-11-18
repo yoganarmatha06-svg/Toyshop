@@ -245,17 +245,6 @@ const ManageCategories = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Banner Image URL</label>
-                <input
-                  type="url"
-                  placeholder="https://images.unsplash.com/..."
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400"
-                />
-              </div>
-
               {/* Image Preview in Modal */}
               {(() => {
                 const previewImg = getCategoryImage({
@@ -310,4 +299,3 @@ const ManageCategories = () => {
 };
 
 export default ManageCategories;
-

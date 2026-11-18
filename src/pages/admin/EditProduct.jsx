@@ -6,6 +6,8 @@ import {
   ArrowLeft,
   Star,
   Save,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
@@ -20,6 +22,7 @@ const EditProduct = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [previewUrlError, setPreviewUrlError] = useState(false);
 
   // Form Fields
   const [name, setName] = useState('');
@@ -88,6 +91,7 @@ const EditProduct = () => {
     if (urls.length > 0) {
       setImageUrls((prev) => [...prev, ...urls]);
       setNewImageUrl('');
+      setPreviewUrlError(false);
       addToast(`${urls.length} image(s) added! 🖼️`, 'success');
     }
   };
@@ -143,7 +147,12 @@ const EditProduct = () => {
       });
       if (data.imageUrls && data.imageUrls.length > 0) {
         setImageUrls((prev) => [...prev, ...data.imageUrls]);
-        addToast(`${data.imageUrls.length} new image(s) uploaded successfully! 📸`, 'success');
+        addToast(
+          data.storage === 'cloudinary'
+            ? `${data.imageUrls.length} image(s) uploaded to Cloudinary! ☁️`
+            : `${data.imageUrls.length} image(s) uploaded successfully! 📸`,
+          'success'
+        );
       }
     } catch (err) {
       console.warn('Multer upload failed, using high-res local image reading fallback...', err);
@@ -438,7 +447,10 @@ const EditProduct = () => {
                     type="text"
                     placeholder="https://... (paste single or comma-separated URLs)"
                     value={newImageUrl}
-                    onChange={(e) => setNewImageUrl(e.target.value)}
+                    onChange={(e) => {
+                      setNewImageUrl(e.target.value);
+                      setPreviewUrlError(false);
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -450,13 +462,71 @@ const EditProduct = () => {
                   <button
                     type="button"
                     onClick={handleAddImageUrl}
-                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black shrink-0 transition-colors"
+                    className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black shrink-0 transition-colors cursor-pointer"
                   >
                     Add
                   </button>
                 </div>
+
+                {/* Instant Live URL Preview (Shows immediately without backend server) */}
+                {newImageUrl.trim().length > 8 && (
+                  <div className="p-2.5 bg-white border border-pink-200 rounded-2xl flex items-center gap-3 shadow-xs transition-all">
+                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center relative">
+                      {!previewUrlError ? (
+                        <img
+                          src={newImageUrl.trim()}
+                          alt="Live URL Preview"
+                          className="w-full h-full object-cover"
+                          onLoad={() => setPreviewUrlError(false)}
+                          onError={() => setPreviewUrlError(true)}
+                        />
+                      ) : (
+                        <div className="p-1 text-center">
+                          <AlertCircle className="w-5 h-5 text-rose-500 mx-auto" />
+                          <span className="text-[8px] text-rose-500 font-bold block leading-tight mt-0.5">Broken Link</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        {!previewUrlError ? (
+                          <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                            <CheckCircle2 className="w-3.5 h-3.5" /> Instant Image Preview Ready
+                          </span>
+                        ) : (
+                          <span className="text-xs font-bold text-rose-600 flex items-center gap-1">
+                            <AlertCircle className="w-3.5 h-3.5" /> Image failed to load
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-slate-500 truncate mt-0.5 font-mono">
+                        {newImageUrl.trim()}
+                      </p>
+                      <div className="flex items-center gap-2 mt-1.5">
+                        <button
+                          type="button"
+                          onClick={handleAddImageUrl}
+                          className="px-3 py-1 bg-pink-500 hover:bg-pink-600 text-white rounded-lg text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+                        >
+                          + Add to Product
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setNewImageUrl('');
+                            setPreviewUrlError(false);
+                          }}
+                          className="px-2 py-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-[10px] text-slate-400">
-                  Tip: Press Enter or click Add to add multiple URLs
+                  Tip: Press Enter or click Add to add multiple URLs. Stored directly to MongoDB!
                 </p>
               </div>
             </div>

@@ -210,9 +210,16 @@ const Shop = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 pt-6">
-        {/* Desktop Sidebar Filters */}
-        <aside className="hidden lg:block space-y-6 bg-white p-6 rounded-3xl border border-slate-100 shadow-xs h-fit sticky top-28">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 pt-6 relative">
+        {/* Desktop Sidebar Filters - Permanently Fixed while scrolling */}
+        <div className="hidden lg:block h-full">
+          <aside
+            className="space-y-6 bg-white p-6 rounded-3xl border border-slate-200/80 shadow-xs sticky top-24 max-h-[calc(100vh-7.5rem)] overflow-y-auto no-scrollbar z-20"
+            style={{
+              position: 'sticky',
+              top: '6rem',
+            }}
+          >
           {/* Keyword Search */}
           <div>
             <h3 className="text-xs font-black text-slate-900 font-heading uppercase tracking-wider mb-2.5">
@@ -303,6 +310,7 @@ const Shop = () => {
             </div>
           </div>
         </aside>
+      </div>
 
         {/* Product Grid Area */}
         <section className="lg:col-span-3">

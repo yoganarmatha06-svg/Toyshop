@@ -1,5 +1,69 @@
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
+import cloudinary, { uploadToCloudinary, isCloudinaryConfigured } from '../config/cloudinary.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+
+/**
+ * Helper to ensure product images are stored on Cloudinary.
+ * Converts local /uploads/ paths, base64 data URIs, or external URLs to Cloudinary secure URLs.
+ */
+const ensureCloudinaryImages = async (images) => {
+  if (!Array.isArray(images) || images.length === 0) return images;
+  if (!isCloudinaryConfigured()) return images;
+
+  const processed = await Promise.all(
+    images.map(async (img) => {
+      if (typeof img !== 'string' || !img.trim()) return img;
+
+      // 1. Already hosted on Cloudinary
+      if (img.includes('cloudinary.com')) return img;
+
+      // 2. Base64 data URI
+      if (img.startsWith('data:image/')) {
+        try {
+          const cloudUrl = await uploadToCloudinary(img, 'toystore/products');
+          return cloudUrl;
+        } catch (err) {
+          console.warn('Failed to upload base64 image to Cloudinary:', err.message);
+          return img;
+        }
+      }
+
+      // 3. Local /uploads/ file path
+      if (img.startsWith('/uploads/')) {
+        try {
+          const filename = path.basename(img);
+          const fullPath = path.join(uploadsDir, filename);
+          if (fs.existsSync(fullPath)) {
+            const cloudUrl = await uploadToCloudinary(fullPath, 'toystore/products');
+            try {
+              fs.unlinkSync(fullPath);
+            } catch (e) {}
+            return cloudUrl;
+          }
+        } catch (err) {
+          console.warn('Failed to upload local image to Cloudinary:', err.message);
+          return img;
+        }
+      }
+
+      // 4. Remote HTTP/HTTPS URL -> Store URL directly in MongoDB
+      if (img.startsWith('http://') || img.startsWith('https://')) {
+        return img.trim();
+      }
+
+      return img;
+    })
+  );
+
+  return processed;
+};
 
 // @desc    Fetch all products with filtering, searching, sorting & pagination
 // @route   GET /api/products
@@ -171,10 +235,13 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: 'Please provide at least a toy name and category' });
     }
 
-    const images =
+    const rawImages =
       Array.isArray(productImages) && productImages.length > 0
         ? productImages
         : ['/logo.png'];
+
+    // Ensure all images are stored on Cloudinary and save Cloudinary links
+    const images = await ensureCloudinaryImages(rawImages);
 
     const safeStock = stockQuantity !== undefined && stockQuantity !== '' ? Number(stockQuantity) : 10;
 
@@ -230,7 +297,8 @@ export const updateProduct = async (req, res) => {
     product.price = price !== undefined ? Number(price) : product.price;
     product.discountPrice = discountPrice !== undefined ? Number(discountPrice) : product.discountPrice;
     if (productImages && Array.isArray(productImages) && productImages.length > 0) {
-      product.productImages = productImages;
+      // Ensure any newly added or updated images are uploaded to Cloudinary
+      product.productImages = await ensureCloudinaryImages(productImages);
     }
     product.category = category ?? product.category;
     product.brand = brand ?? product.brand;
@@ -262,6 +330,24 @@ export const deleteProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
 
     if (product) {
+      // Optional: Delete images from Cloudinary if stored there
+      if (isCloudinaryConfigured() && Array.isArray(product.productImages)) {
+        for (const imgUrl of product.productImages) {
+          if (imgUrl && typeof imgUrl === 'string' && imgUrl.includes('cloudinary.com')) {
+            try {
+              const parts = imgUrl.split('/upload/');
+              if (parts.length > 1) {
+                const publicPath = parts[1].replace(/^v\d+\//, '');
+                const publicId = publicPath.substring(0, publicPath.lastIndexOf('.'));
+                if (publicId) await cloudinary.uploader.destroy(publicId);
+              }
+            } catch (cleanupErr) {
+              console.warn('Could not remove product image from Cloudinary:', cleanupErr.message);
+            }
+          }
+        }
+      }
+
       await Product.findByIdAndDelete(req.params.id);
       res.json({ message: 'Toy removed successfully' });
     } else {
@@ -272,19 +358,58 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
-// @desc    Upload multiple product images
+// @desc    Upload multiple product images to Cloudinary (with fallback to local storage)
 // @route   POST /api/products/upload
 // @access  Private/Admin
-export const uploadImages = (req, res) => {
+export const uploadImages = async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ message: 'No images uploaded' });
   }
 
-  const fileUrls = req.files.map((file) => `/uploads/${file.filename}`);
-  res.json({
-    message: 'Images uploaded successfully',
-    imageUrls: fileUrls,
-  });
+  try {
+    // If Cloudinary is configured, upload directly to Cloudinary
+    if (isCloudinaryConfigured()) {
+      const uploadPromises = req.files.map(async (file) => {
+        const cloudUrl = await uploadToCloudinary(file.path, 'toystore/products');
+        // Delete local temporary file from disk after successful Cloudinary upload
+        try {
+          if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+          }
+        } catch (unlinkErr) {
+          console.warn('Could not remove temporary local file:', unlinkErr.message);
+        }
+        return cloudUrl;
+      });
+
+      const cloudinaryUrls = await Promise.all(uploadPromises);
+
+      return res.json({
+        message: 'Images uploaded successfully to Cloudinary! ☁️',
+        imageUrls: cloudinaryUrls,
+        storage: 'cloudinary',
+      });
+    }
+
+    // Fallback: If Cloudinary credentials are not configured yet in .env, save to local /uploads/
+    console.warn('⚠️ Cloudinary not configured in .env. Saving locally to /uploads.');
+    const fileUrls = req.files.map((file) => `/uploads/${file.filename}`);
+    return res.json({
+      message: 'Images uploaded locally (Cloudinary credentials not set in server/.env)',
+      imageUrls: fileUrls,
+      storage: 'local',
+    });
+  } catch (error) {
+    console.error('Error during image upload:', error);
+    // Keep local file and return local path if Cloudinary upload throws an error
+    const fallbackUrls = req.files.map((file) => `/uploads/${file.filename}`);
+    return res.json({
+      message: 'Cloudinary upload failed, fallen back to local storage',
+      imageUrls: fallbackUrls,
+      storage: 'local',
+      error: error.message,
+    });
+  }
 };
 
 // @desc    Get brands and age groups list

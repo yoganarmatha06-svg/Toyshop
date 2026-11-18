@@ -121,7 +121,7 @@ export const seedDatabase = async () => {
         description: 'Water blasters, sports kits, ride-on scooters, and active lawn play.',
         icon: '⚽',
         color: '#CCFBF1',
-        image: 'https://images.unsplash.com/photo-1533518463841-d62e1fc91373?auto=format&fit=crop&w=600&q=80',
+        image: 'https://res.cloudinary.com/kuaksawn/image/upload/v1794995999/toystore/products/lqhqlgmaxx7wsbsjbg6r.jpg',
       },
       {
         name: 'Puzzle Games',
@@ -335,6 +335,7 @@ export const seedDatabase = async () => {
         price: 2199,
         discountPrice: 1799,
         productImages: [
+          'https://res.cloudinary.com/kuaksawn/image/upload/v1794995572/toystore/products/clqsh4lfn5rebqq4jvmk.jpg',
           'https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=800&q=80',
         ],
         category: catMap['Board Games'],
@@ -373,6 +374,7 @@ export const seedDatabase = async () => {
         price: 1199,
         discountPrice: 899,
         productImages: [
+          'https://res.cloudinary.com/kuaksawn/image/upload/v1794995999/toystore/products/lqhqlgmaxx7wsbsjbg6r.jpg',
           'https://images.unsplash.com/photo-1533518463841-d62e1fc91373?auto=format&fit=crop&w=800&q=80',
         ],
         category: catMap['Outdoor Toys'],

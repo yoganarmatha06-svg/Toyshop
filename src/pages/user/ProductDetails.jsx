@@ -132,10 +132,11 @@ const ProductDetails = () => {
 
   const isLiked = isInWishlist(product._id);
   const isOutOfStock = product.stockQuantity <= 0;
+  const hasDiscount = product.discountPrice > 0 && !product.isFeatured;
   const originalPrice = product.price;
-  const currentPrice = product.discountPrice > 0 ? product.discountPrice : product.price;
+  const currentPrice = hasDiscount ? product.discountPrice : product.price;
   const discountPercent =
-    product.discountPrice > 0
+    hasDiscount
       ? Math.round(((originalPrice - product.discountPrice) / originalPrice) * 100)
       : 0;
 
@@ -254,12 +255,12 @@ const ProductDetails = () => {
             <span className="text-3xl sm:text-4xl font-black text-slate-900 font-heading">
               ₹{currentPrice.toLocaleString('en-IN')}
             </span>
-            {product.discountPrice > 0 && (
+            {hasDiscount && product.discountPrice > 0 && (
               <span className="text-lg text-slate-400 line-through font-semibold">
                 ₹{originalPrice.toLocaleString('en-IN')}
               </span>
             )}
-            {discountPercent > 0 && (
+            {hasDiscount && discountPercent > 0 && (
               <span className="text-xs font-black text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full">
                 You Save ₹{(originalPrice - currentPrice).toLocaleString('en-IN')}!
               </span>

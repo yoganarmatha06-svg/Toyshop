@@ -2,15 +2,12 @@
 
 @layer base {
   html {
+    font-size: 18px;
     scroll-behavior: smooth;
-    overflow-x: hidden;
-    max-width: 100vw;
   }
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    overflow-x: hidden;
-    max-width: 100vw;
   }
 
   h1, h2, h3, .font-heading {
@@ -42,20 +39,30 @@
 
 
 
-/* Custom subtle scrollbar */
+/* Completely hide scrollbars globally across the website while keeping smooth scrolling functional */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
-::-webkit-scrollbar-track {
-  background: #fdf2f8;
+
+html, body, #root, * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
-::-webkit-scrollbar-thumb {
-  background: #f472b6;
-  border-radius: 9999px;
+
+/* Utility to completely hide scrollbar while keeping scrollable functionality */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #ec4899;
+
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
 }
 
 /* Subtle 3D background floating animation */

@@ -316,10 +316,18 @@ const EditProduct = () => {
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Price (₹) *</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder="Type price"
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setPrice(val);
+                  }
+                }}
+                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
                 required
               />
             </div>
@@ -327,20 +335,36 @@ const EditProduct = () => {
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Discount Price (₹)</label>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder="Type discount price"
                 value={discountPrice}
-                onChange={(e) => setDiscountPrice(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setDiscountPrice(val);
+                  }
+                }}
+                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Stock Quantity *</label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder="Type stock"
                 value={stockQuantity}
-                onChange={(e) => setStockQuantity(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || /^\d*$/.test(val)) {
+                    setStockQuantity(val);
+                  }
+                }}
+                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
                 required
               />
             </div>

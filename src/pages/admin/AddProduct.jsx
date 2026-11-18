@@ -286,12 +286,18 @@ const AddProduct = () => {
                 Price (₹) <span className="text-slate-400 font-normal">(optional)</span>
               </label>
               <input
-                type="number"
-                placeholder="1999"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder="Type price (e.g. 1999)"
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400"
-                min="0"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setPrice(val);
+                  }
+                }}
+                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
               />
             </div>
 
@@ -300,12 +306,18 @@ const AddProduct = () => {
                 Discount Price (₹) <span className="text-slate-400 font-normal">(optional)</span>
               </label>
               <input
-                type="number"
-                placeholder="1599"
+                type="text"
+                inputMode="decimal"
+                autoComplete="off"
+                placeholder="Type discount price (e.g. 1599)"
                 value={discountPrice}
-                onChange={(e) => setDiscountPrice(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400"
-                min="0"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || /^\d*\.?\d*$/.test(val)) {
+                    setDiscountPrice(val);
+                  }
+                }}
+                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
               />
             </div>
 
@@ -314,12 +326,18 @@ const AddProduct = () => {
                 Initial Stock Quantity <span className="text-slate-400 font-normal">(optional)</span>
               </label>
               <input
-                type="number"
-                placeholder="15"
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder="Type stock (e.g. 15)"
                 value={stockQuantity}
-                onChange={(e) => setStockQuantity(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400"
-                min="0"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (val === '' || /^\d*$/.test(val)) {
+                    setStockQuantity(val);
+                  }
+                }}
+                className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
               />
             </div>
           </div>

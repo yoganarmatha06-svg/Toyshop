@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, User, Phone, Mail, MapPin, ShoppingBag, ShieldCheck, Sparkles, Loader2 } from 'lucide-react';
+import { X, User, Phone, Mail, MapPin, Building, ShoppingBag, ShieldCheck, Sparkles, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 
 const AddToCartModal = ({ isOpen, onClose, onConfirm, product, quantity = 1, loading = false }) => {
   const { user } = useAuth();
@@ -11,8 +12,8 @@ const AddToCartModal = ({ isOpen, onClose, onConfirm, product, quantity = 1, loa
     phone: '',
     email: '',
     address: '',
-    city: 'Chennai',
-    postalCode: '600001',
+    city: '',
+    postalCode: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -28,10 +29,29 @@ const AddToCartModal = ({ isOpen, onClose, onConfirm, product, quantity = 1, loa
         phone: user?.phone || parsedSaved.phone || '',
         email: user?.email || parsedSaved.email || '',
         address: parsedSaved.address || '',
-        city: parsedSaved.city || 'Chennai',
-        postalCode: parsedSaved.postalCode || '600001',
+        city: parsedSaved.city || '',
+        postalCode: parsedSaved.postalCode || '',
       });
       setErrors({});
+
+      if (user) {
+        api
+          .get('/users/addresses')
+          .then(({ data }) => {
+            if (Array.isArray(data) && data.length > 0) {
+              const defAddr = data.find((a) => a.isDefault) || data[0];
+              setFormData((prev) => ({
+                name: prev.name || defAddr.fullName || user.name || '',
+                phone: prev.phone || defAddr.phoneNumber || user.phone || '',
+                email: prev.email || user.email || '',
+                address: prev.address || defAddr.streetAddress || '',
+                city: prev.city || defAddr.city || '',
+                postalCode: prev.postalCode || defAddr.postalCode || '',
+              }));
+            }
+          })
+          .catch(() => {});
+      }
     }
   }, [isOpen, user]);
 
@@ -64,6 +84,10 @@ const AddToCartModal = ({ isOpen, onClose, onConfirm, product, quantity = 1, loa
 
     if (!formData.address.trim()) {
       newErrors.address = 'Delivery address is required';
+    }
+
+    if (!formData.city.trim()) {
+      newErrors.city = 'City is required';
     }
 
     setErrors(newErrors);
@@ -260,6 +284,46 @@ const AddToCartModal = ({ isOpen, onClose, onConfirm, product, quantity = 1, loa
                 {errors.address && (
                   <p className="text-[11px] text-rose-500 font-bold mt-1">{errors.address}</p>
                 )}
+              </div>
+
+              {/* City and Pincode */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* City */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    City <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Building className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <input
+                      type="text"
+                      value={formData.city}
+                      onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                      placeholder="e.g. Sivakasi, Chennai, Madurai"
+                      className={`w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm rounded-xl border bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 transition-all ${
+                        errors.city
+                          ? 'border-rose-400 focus:ring-rose-200'
+                          : 'border-slate-200 focus:border-pink-500 focus:ring-pink-100'
+                      }`}
+                    />
+                  </div>
+                  {errors.city && <p className="text-[11px] text-rose-500 font-bold mt-1">{errors.city}</p>}
+                </div>
+
+                {/* Postal Code / Pincode */}
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Pincode
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={formData.postalCode}
+                    onChange={(e) => setFormData({ ...formData, postalCode: e.target.value.replace(/\D/g, '') })}
+                    placeholder="6-digit pincode"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:outline-none focus:ring-2 focus:border-pink-500 focus:ring-pink-100 transition-all"
+                  />
+                </div>
               </div>
 
               {/* Trust Badge */}

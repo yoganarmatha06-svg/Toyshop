@@ -23,6 +23,8 @@ const customerDetailsSchema = new mongoose.Schema({
   phone: { type: String, trim: true },
   email: { type: String, trim: true },
   address: { type: String, trim: true },
+  city: { type: String, trim: true },
+  postalCode: { type: String, trim: true },
 });
 
 const cartSchema = new mongoose.Schema(

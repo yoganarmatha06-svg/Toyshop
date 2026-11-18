@@ -271,8 +271,16 @@ const ManageOrders = () => {
               </p>
               <p className="text-slate-800 font-bold">{selectedOrder.shippingAddress?.fullName}</p>
               <p className="text-slate-600 leading-relaxed">
-                {selectedOrder.shippingAddress?.streetAddress}, {selectedOrder.shippingAddress?.city},{' '}
-                {selectedOrder.shippingAddress?.state} - {selectedOrder.shippingAddress?.postalCode}
+                {[
+                  selectedOrder.shippingAddress?.houseFlatNo,
+                  selectedOrder.shippingAddress?.streetAddress,
+                  selectedOrder.shippingAddress?.landmark ? `(Landmark: ${selectedOrder.shippingAddress.landmark})` : null,
+                  selectedOrder.shippingAddress?.city,
+                  selectedOrder.shippingAddress?.state,
+                ]
+                  .filter(Boolean)
+                  .join(', ')}
+                {selectedOrder.shippingAddress?.postalCode ? ` - ${selectedOrder.shippingAddress.postalCode}` : ''}
               </p>
               <p className="text-slate-700 font-semibold pt-1">
                 📞 {selectedOrder.shippingAddress?.phoneNumber}

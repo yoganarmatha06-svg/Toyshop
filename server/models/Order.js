@@ -23,10 +23,12 @@ const orderSchema = new mongoose.Schema(
     shippingAddress: {
       fullName: { type: String, required: true },
       phoneNumber: { type: String, required: true },
+      houseFlatNo: { type: String, default: '', trim: true },
       streetAddress: { type: String, required: true },
-      city: { type: String, required: true },
-      state: { type: String, required: true },
-      postalCode: { type: String, required: true },
+      landmark: { type: String, default: '', trim: true },
+      city: { type: String, default: '', trim: true },
+      state: { type: String, default: '', trim: true },
+      postalCode: { type: String, default: '', trim: true },
       country: { type: String, default: 'India' },
     },
     paymentMethod: {

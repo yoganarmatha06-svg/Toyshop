@@ -1,20 +1,30 @@
 import Order from '../models/Order.js';
 import Product from '../models/Product.js';
 import Cart from '../models/Cart.js';
+import Address from '../models/Address.js';
 
 // @desc    Create new order (with server-side price & stock validation)
 // @route   POST /api/orders
 // @access  Private
 export const createOrder = async (req, res) => {
   try {
-    const { orderItems, shippingAddress, paymentMethod, paymentResult, isPaid } = req.body;
+    const { orderItems, shippingAddress, shippingAddressId, paymentMethod, paymentResult, isPaid } = req.body;
 
     if (!orderItems || orderItems.length === 0) {
       return res.status(400).json({ message: 'No order items' });
     }
 
-    if (!shippingAddress || !shippingAddress.streetAddress || !shippingAddress.city) {
-      return res.status(400).json({ message: 'Shipping address is required' });
+    let addrSource = shippingAddress || {};
+
+    if (shippingAddressId) {
+      const dbAddr = await Address.findOne({ _id: shippingAddressId, user: req.user._id });
+      if (dbAddr) {
+        addrSource = dbAddr;
+      }
+    }
+
+    if (!addrSource.streetAddress) {
+      return res.status(400).json({ message: 'Valid delivery address is required' });
     }
 
     // Server-side validation of products, prices and stock
@@ -72,13 +82,15 @@ export const createOrder = async (req, res) => {
     }
 
     const formattedShippingAddress = {
-      fullName: shippingAddress.fullName || req.user?.name || 'Customer',
-      phoneNumber: shippingAddress.phoneNumber || req.user?.phone || '9876543210',
-      streetAddress: shippingAddress.streetAddress || 'Delivery Address',
-      city: shippingAddress.city || 'Chennai',
-      state: shippingAddress.state || 'Tamil Nadu',
-      postalCode: shippingAddress.postalCode || '600001',
-      country: shippingAddress.country || 'India',
+      fullName: (addrSource.fullName || req.user?.name || 'Customer').trim(),
+      phoneNumber: (addrSource.phoneNumber || req.user?.phone || '').trim(),
+      houseFlatNo: (addrSource.houseFlatNo || '').trim(),
+      streetAddress: (addrSource.streetAddress || '').trim(),
+      landmark: (addrSource.landmark || '').trim(),
+      city: (addrSource.city || '').trim(),
+      state: (addrSource.state || '').trim(),
+      postalCode: (addrSource.postalCode || '').trim(),
+      country: (addrSource.country || 'India').trim(),
     };
 
     const order = new Order({

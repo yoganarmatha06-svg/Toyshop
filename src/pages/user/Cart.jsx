@@ -14,6 +14,7 @@ import {
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
+import CartDeliveryAddress from '../../components/CartDeliveryAddress/CartDeliveryAddress';
 
 const Cart = () => {
   const { cart, subtotal, totalItems, updateQuantity, removeFromCart, clearCart } = useCart();
@@ -23,6 +24,11 @@ const Cart = () => {
 
   const [promoCode, setPromoCode] = useState('');
   const [discountPercent, setDiscountPercent] = useState(0);
+
+  // Address selection state for the current order
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [allAddresses, setAllAddresses] = useState([]);
 
   // Coupon code is enabled ONLY when purchase amount (subtotal) is above ₹2,000
   const COUPON_MIN_PURCHASE = 2000;
@@ -59,6 +65,38 @@ const Cart = () => {
     setDiscountPercent(0);
     setPromoCode('');
     addToast('Coupon removed', 'info');
+  };
+
+  const handleSelectAddress = (id, addr) => {
+    setSelectedAddressId(id);
+    setSelectedAddress(addr);
+  };
+
+  const handleAddressesChange = (list) => {
+    setAllAddresses(list);
+  };
+
+  const handleProceedToCheckout = () => {
+    if (!selectedAddressId || !selectedAddress) {
+      addToast('Please select or add a delivery address before proceeding to checkout', 'error');
+      const addressSection = document.getElementById('delivery-address-section');
+      if (addressSection) {
+        addressSection.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
+    navigate('/checkout', {
+      state: {
+        selectedAddressId,
+        selectedAddress,
+        discountPercent: isCouponEnabled ? discountPercent : 0,
+        discountAmount: isCouponEnabled ? discountAmount : 0,
+        promoCode: isCouponEnabled ? promoCode : '',
+      },
+    });
   };
 
   if (!isAuthenticated) {
@@ -122,30 +160,31 @@ const Cart = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-4">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 font-heading">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
             Shopping Cart 🛍️
           </h1>
           <p className="text-xs text-slate-500 font-medium">
             You have {totalItems} item{totalItems > 1 ? 's' : ''} in your cart
           </p>
         </div>
+      </div>
 
-        <button
-          onClick={clearCart}
-          className="text-xs font-bold text-rose-500 hover:text-rose-600 flex items-center gap-1.5 self-start sm:self-auto"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-          <span>Clear All Items</span>
-        </button>
+      {/* Delivery Address Section at the Top */}
+      <div id="delivery-address-section">
+        <CartDeliveryAddress
+          selectedAddressId={selectedAddressId}
+          onSelectAddress={handleSelectAddress}
+          onAddressesChange={handleAddressesChange}
+        />
       </div>
 
       {/* Free shipping threshold banner */}
-      <div className="bg-amber-50 rounded-2xl p-4 border border-amber-200/80">
-        <div className="flex items-center justify-between text-xs font-bold text-amber-900 mb-2">
+      <div className="bg-amber-50 rounded-2xl p-3 sm:p-3.5 border border-amber-200/80">
+        <div className="flex items-center justify-between text-xs font-bold text-amber-900 mb-1.5">
           <span className="flex items-center gap-1.5">
             <Truck className="w-4 h-4 text-amber-600" />
             {eligibleForFreeShipping
@@ -162,7 +201,7 @@ const Cart = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-10">
         {/* Cart Items List */}
         <div className="lg:col-span-8 space-y-4">
           {items.map((item) => {
@@ -385,15 +424,7 @@ const Cart = () => {
 
             {/* Checkout Action */}
             <button
-              onClick={() =>
-                navigate('/checkout', {
-                  state: {
-                    discountPercent: isCouponEnabled ? discountPercent : 0,
-                    discountAmount: isCouponEnabled ? discountAmount : 0,
-                    promoCode: isCouponEnabled ? promoCode : '',
-                  },
-                })
-              }
+              onClick={handleProceedToCheckout}
               className="w-full py-4 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-extrabold text-sm shadow-lg shadow-pink-300/50 hover:shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Proceed to Checkout</span>

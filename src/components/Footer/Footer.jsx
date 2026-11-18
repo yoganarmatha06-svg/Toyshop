@@ -91,6 +91,7 @@ const Footer = () => {
               Customer Joy
             </h4>
             <ul className="space-y-2 text-xs">
+              <li><Link to="/about" className="hover:text-pink-400 transition-colors">About Toy World</Link></li>
               <li><Link to="/my-orders" className="hover:text-pink-400 transition-colors">Track Orders</Link></li>
               <li><Link to="/cart" className="hover:text-pink-400 transition-colors">View Shopping Cart</Link></li>
               <li><Link to="/wishlist" className="hover:text-pink-400 transition-colors">Saved Wishlist</Link></li>

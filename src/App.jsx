@@ -14,6 +14,7 @@ import Shop from './pages/user/Shop';
 import ProductDetails from './pages/user/ProductDetails';
 import Cart from './pages/user/Cart';
 import Wishlist from './pages/user/Wishlist';
+import About from './pages/user/About';
 import Checkout from './pages/user/Checkout';
 import MyOrders from './pages/user/MyOrders';
 import Profile from './pages/user/Profile';
@@ -41,6 +42,7 @@ function App() {
       <Route element={<UserLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/about" element={<About />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/wishlist" element={<Wishlist />} />

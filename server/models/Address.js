@@ -14,31 +14,38 @@ const addressSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
-      required: [true, 'Phone number is required'],
+      required: [true, 'Mobile number is required'],
       trim: true,
+    },
+    houseFlatNo: {
+      type: String,
+      trim: true,
+      default: '',
     },
     streetAddress: {
       type: String,
-      required: [true, 'Street address is required'],
+      required: [true, 'Street / Area is required'],
       trim: true,
+    },
+    landmark: {
+      type: String,
+      trim: true,
+      default: '',
     },
     city: {
       type: String,
-      required: [true, 'City is required'],
       trim: true,
-      default: 'Chennai',
+      default: '',
     },
     state: {
       type: String,
-      required: [true, 'State is required'],
       trim: true,
-      default: 'Tamil Nadu',
+      default: '',
     },
     postalCode: {
       type: String,
-      required: [true, 'Postal / PIN code is required'],
       trim: true,
-      default: '600001',
+      default: '',
     },
     country: {
       type: String,
@@ -57,4 +64,3 @@ const addressSchema = new mongoose.Schema(
 
 const Address = mongoose.model('Address', addressSchema);
 export default Address;
-

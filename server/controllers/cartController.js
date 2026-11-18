@@ -131,11 +131,7 @@ export const addToCart = async (req, res) => {
       }
 
       // Fallback defaults for authenticated users so subsequent adds to cart never fail
-      if (!finalPhone) finalPhone = currentUser.phone || '9876543210';
-      if (!finalAddress) finalAddress = 'Customer Delivery Address';
-      if (!finalCity) finalCity = 'Chennai';
-      if (!finalState) finalState = 'Tamil Nadu';
-      if (!finalPostalCode) finalPostalCode = '600001';
+      if (!finalPhone) finalPhone = currentUser.phone || '';
     }
 
     // 4. Validate Required User Details (Required on 1st time for new/guest users)
@@ -165,6 +161,10 @@ export const addToCart = async (req, res) => {
 
       if (!finalAddress) {
         return res.status(400).json({ requiresDetails: true, message: 'Delivery address is required' });
+      }
+
+      if (!finalCity) {
+        return res.status(400).json({ requiresDetails: true, message: 'City is required' });
       }
     }
 
@@ -198,21 +198,26 @@ export const addToCart = async (req, res) => {
       token = generateToken(userId);
     }
 
-    // 6. Process & Store Address in Database
-    const addressDoc = await Address.findOneAndUpdate(
-      { user: userId },
-      {
-        user: userId,
-        fullName: finalName,
-        phoneNumber: finalPhone,
-        streetAddress: finalAddress,
-        city: finalCity || 'Chennai',
-        state: finalState || 'Tamil Nadu',
-        postalCode: finalPostalCode || '600001',
-        isDefault: true,
-      },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
-    );
+    // 6. Process & Store Address in Database (if address was supplied)
+    let addressDoc = null;
+    if (finalAddress) {
+      addressDoc = await Address.findOneAndUpdate(
+        { user: userId },
+        {
+          user: userId,
+          fullName: finalName,
+          phoneNumber: finalPhone,
+          streetAddress: finalAddress,
+          city: finalCity || '',
+          state: finalState || '',
+          postalCode: finalPostalCode || '',
+          isDefault: true,
+        },
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+    } else if (userId) {
+      addressDoc = await Address.findOne({ user: userId });
+    }
 
     // 7. Process & Store Cart in Database
     let cart = await Cart.findOne({ user: userId });
@@ -225,6 +230,8 @@ export const addToCart = async (req, res) => {
       phone: finalPhone,
       email: finalEmail,
       address: finalAddress,
+      city: finalCity || '',
+      postalCode: finalPostalCode || '',
     };
 
     const effectivePrice = product.discountPrice > 0 ? product.discountPrice : product.price;

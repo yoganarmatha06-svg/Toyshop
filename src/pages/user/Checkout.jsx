@@ -40,7 +40,9 @@ const Checkout = () => {
   const [newAddress, setNewAddress] = useState({
     fullName: user?.name || '',
     phoneNumber: user?.phone || '',
+    houseFlatNo: '',
     streetAddress: '',
+    landmark: '',
     city: '',
     state: '',
     postalCode: '',
@@ -56,32 +58,12 @@ const Checkout = () => {
         const { data } = await api.get('/users/addresses');
         setAddresses(data || []);
         if (data && data.length > 0) {
-          const defaultAddr = data.find((a) => a.isDefault) || data[0];
+          const fromState = location.state?.selectedAddressId;
+          const matched = fromState ? data.find((a) => a._id === fromState) : null;
+          const defaultAddr = matched || data.find((a) => a.isDefault) || data[0];
           setSelectedAddressId(defaultAddr._id);
+          setShowAddressForm(false);
         } else {
-          // If no address in Address collection, check if user provided customerDetails during Add to Cart
-          try {
-            const savedDetails = localStorage.getItem('customerDetails');
-            const parsed = savedDetails ? JSON.parse(savedDetails) : null;
-            if (parsed?.address) {
-              const { data: newAddr } = await api.post('/users/addresses', {
-                fullName: parsed.name || user?.name || 'Customer',
-                phoneNumber: parsed.phone || user?.phone || '9876543210',
-                streetAddress: parsed.address,
-                city: parsed.city || 'Chennai',
-                state: parsed.state || 'Tamil Nadu',
-                postalCode: parsed.postalCode || '600001',
-                country: 'India',
-                isDefault: true,
-              });
-              setAddresses([newAddr]);
-              setSelectedAddressId(newAddr._id);
-              setShowAddressForm(false);
-              return;
-            }
-          } catch (e) {
-            // ignore
-          }
           setShowAddressForm(true);
         }
       } catch (err) {
@@ -92,7 +74,7 @@ const Checkout = () => {
     };
 
     fetchAddresses();
-  }, [user]);
+  }, [user, location.state]);
 
   const handleCreateAddress = async (e) => {
     e.preventDefault();
@@ -156,6 +138,7 @@ const Checkout = () => {
         const { data: createdOrder } = await api.post('/orders', {
           orderItems,
           shippingAddress: selectedAddress,
+          shippingAddressId: selectedAddressId,
           paymentMethod: 'COD',
           isPaid: false,
         });
@@ -176,6 +159,7 @@ const Checkout = () => {
           const { data: confirmedOrder } = await api.post('/orders', {
             orderItems,
             shippingAddress: selectedAddress,
+            shippingAddressId: selectedAddressId,
             paymentMethod: 'Razorpay',
             isPaid: true,
             paymentResult: {
@@ -218,6 +202,7 @@ const Checkout = () => {
               const { data: confirmedOrder } = await api.post('/orders', {
                 orderItems,
                 shippingAddress: selectedAddress,
+                shippingAddressId: selectedAddressId,
                 paymentMethod: 'Razorpay',
                 isPaid: true,
                 paymentResult: {
@@ -356,7 +341,16 @@ const Checkout = () => {
                       )}
                     </div>
                     <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                      {addr.streetAddress}, {addr.city}, {addr.state} - {addr.postalCode}
+                      {[
+                        addr.houseFlatNo,
+                        addr.streetAddress,
+                        addr.landmark ? `(Landmark: ${addr.landmark})` : null,
+                        addr.city,
+                        addr.state,
+                      ]
+                        .filter(Boolean)
+                        .join(', ')}
+                      {addr.postalCode ? ` - ${addr.postalCode}` : ''}
                     </p>
                     <p className="text-xs font-bold text-slate-700 mt-2">
                       📞 {addr.phoneNumber}
@@ -398,15 +392,38 @@ const Checkout = () => {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">House / Flat Number</label>
+                    <input
+                      type="text"
+                      value={newAddress.houseFlatNo}
+                      onChange={(e) => setNewAddress({ ...newAddress, houseFlatNo: e.target.value })}
+                      placeholder="e.g. Flat 302, Green Heights"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400 min-h-[44px]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-700 mb-1">Street / Area *</label>
+                    <input
+                      type="text"
+                      value={newAddress.streetAddress}
+                      onChange={(e) => setNewAddress({ ...newAddress, streetAddress: e.target.value })}
+                      placeholder="Street name, colony, area"
+                      className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400 min-h-[44px]"
+                      required
+                    />
+                  </div>
+                </div>
+
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1">Street Address / House No. *</label>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">Landmark (optional)</label>
                   <input
                     type="text"
-                    value={newAddress.streetAddress}
-                    onChange={(e) => setNewAddress({ ...newAddress, streetAddress: e.target.value })}
-                    placeholder="Apartment, building, street, area..."
+                    value={newAddress.landmark}
+                    onChange={(e) => setNewAddress({ ...newAddress, landmark: e.target.value })}
+                    placeholder="Near school, behind temple, etc."
                     className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-pink-400 min-h-[44px]"
-                    required
                   />
                 </div>
 

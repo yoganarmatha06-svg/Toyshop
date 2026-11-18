@@ -73,7 +73,7 @@ export const CartProvider = ({ children }) => {
    */
   const getSavedCustomerDetails = () => {
     // 1. From context state
-    if (customerDetails?.name && customerDetails?.address) {
+    if (customerDetails?.name && customerDetails?.address && customerDetails?.city) {
       return customerDetails;
     }
 
@@ -82,7 +82,7 @@ export const CartProvider = ({ children }) => {
       const saved = localStorage.getItem('customerDetails');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (parsed?.name && parsed?.address) {
+        if (parsed?.name && parsed?.address && parsed?.city) {
           return parsed;
         }
       }
@@ -91,7 +91,7 @@ export const CartProvider = ({ children }) => {
     }
 
     // 3. From cart customerDetails (MongoDB)
-    if (cart?.customerDetails?.name && cart?.customerDetails?.address) {
+    if (cart?.customerDetails?.name && cart?.customerDetails?.address && cart?.customerDetails?.city) {
       return cart.customerDetails;
     }
 

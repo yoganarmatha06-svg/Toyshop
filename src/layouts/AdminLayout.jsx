@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Package,
@@ -21,6 +21,7 @@ import toyLogo from '../assets/logo.png';
 const AdminLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -37,6 +38,26 @@ const AdminLayout = () => {
     { name: 'Users', path: '/admin/users', icon: Users },
     { name: 'Sales Reports', path: '/admin/reports', icon: BarChart3 },
   ];
+
+  // Precise route matching: ensures ONLY ONE menu item is active at any time
+  const isItemActive = (itemPath) => {
+    const current = location.pathname;
+
+    // Exact path match
+    if (current === itemPath) return true;
+
+    // Root /admin redirects to /admin/dashboard
+    if (itemPath === '/admin/dashboard' && (current === '/admin' || current === '/admin/')) {
+      return true;
+    }
+
+    // When editing a product, highlight "Manage Products" (and not "Add Product")
+    if (itemPath === '/admin/products' && current.startsWith('/admin/products/edit')) {
+      return true;
+    }
+
+    return false;
+  };
 
   return (
     <div className="min-h-screen bg-slate-100/70 flex flex-col md:flex-row">
@@ -61,14 +82,23 @@ const AdminLayout = () => {
         </button>
       </div>
 
-      {/* Sidebar */}
+      {/* Mobile Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-40 md:hidden"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Permanently Fixed Sidebar */}
       <aside
-        className={`fixed md:sticky top-0 z-40 inset-y-0 left-0 w-64 bg-slate-900 text-slate-300 flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 md:z-40 w-64 h-screen bg-slate-900 text-slate-300 flex flex-col transition-transform duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        } md:translate-x-0 shadow-2xl md:shadow-none select-none`}
       >
         {/* Brand */}
-        <div className="p-4 border-b border-slate-800 flex items-center justify-between relative">
+        <div className="shrink-0 p-4 border-b border-slate-800 flex items-center justify-between relative">
           <Link to="/admin/dashboard" className="flex flex-col items-center mx-auto group">
             <img
               src={toyLogo}
@@ -81,7 +111,7 @@ const AdminLayout = () => {
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="md:hidden text-slate-400 hover:text-white absolute top-4 right-4"
+            className="md:hidden text-slate-400 hover:text-white absolute top-4 right-4 p-1 rounded-lg hover:bg-slate-800 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -91,28 +121,32 @@ const AdminLayout = () => {
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
+            const active = isItemActive(item.path);
+
             return (
-              <NavLink
+              <Link
                 key={item.name}
                 to={item.path}
                 onClick={() => setSidebarOpen(false)}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
-                    isActive
-                      ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md shadow-pink-500/20'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800/80'
-                  }`
-                }
+                className={`group flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  active
+                    ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-md shadow-pink-500/25 ring-1 ring-white/10'
+                    : 'text-slate-400 bg-transparent hover:bg-pink-500/15 hover:text-pink-200'
+                }`}
               >
-                <Icon className="w-4 h-4 flex-shrink-0" />
+                <Icon
+                  className={`w-4 h-4 flex-shrink-0 transition-colors ${
+                    active ? 'text-white' : 'text-slate-400 group-hover:text-pink-300'
+                  }`}
+                />
                 <span>{item.name}</span>
-              </NavLink>
+              </Link>
             );
           })}
         </nav>
 
         {/* Quick Back to Store */}
-        <div className="p-4 border-t border-slate-800 space-y-2">
+        <div className="shrink-0 p-4 border-t border-slate-800 space-y-2">
           <Link
             to="/"
             target="_blank"
@@ -124,22 +158,22 @@ const AdminLayout = () => {
             <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
           </Link>
 
-          {/* User profile card & Logout */}
+          {/* Admin profile card & Logout */}
           <div className="pt-2 flex items-center justify-between">
             <div className="flex items-center gap-2.5 truncate">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-black flex items-center justify-center text-xs ring-2 ring-pink-500/50 flex-shrink-0">
-                {user?.name?.charAt(0)?.toUpperCase() || 'A'}
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-amber-400 to-pink-500 text-slate-900 font-black flex items-center justify-center text-xs ring-2 ring-amber-400/40 flex-shrink-0">
+                A
               </div>
               <div className="truncate">
-                <p className="text-xs font-bold text-white truncate">{user?.name}</p>
-                <p className="text-[10px] text-slate-400 truncate">{user?.email}</p>
+                <p className="text-xs font-bold text-white truncate">Admin</p>
+                <p className="text-[10px] text-amber-400/90 font-medium truncate">admin@toystore.com</p>
               </div>
             </div>
 
             <button
               onClick={handleLogout}
-              title="Logout"
-              className="p-2 text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 rounded-lg transition-colors"
+              title="Logout from Admin Portal"
+              className="p-2 text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 rounded-lg transition-colors cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -148,8 +182,8 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main Admin Content Canvas */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <header className="hidden md:flex bg-white border-b border-slate-200 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-xs">
+      <div className="flex-1 md:ml-64 flex flex-col min-w-0 min-h-screen">
+        <header className="hidden md:flex bg-white/95 backdrop-blur-md border-b border-slate-200 px-8 py-4 items-center justify-between sticky top-0 z-30 shadow-xs">
           <div>
             <h2 className="text-lg font-black text-slate-800 font-heading flex items-center gap-1.5">
               <span className="font-logo text-xl text-slate-900">Toy<span className="text-pink-500 ml-0.5">World</span></span> Administration

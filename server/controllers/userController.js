@@ -19,10 +19,21 @@ export const getUserAddresses = async (req, res) => {
 // @access  Private
 export const addAddress = async (req, res) => {
   try {
-    const { fullName, phoneNumber, streetAddress, city, state, postalCode, country, isDefault } = req.body;
+    const {
+      fullName,
+      phoneNumber,
+      houseFlatNo,
+      streetAddress,
+      landmark,
+      city,
+      state,
+      postalCode,
+      country,
+      isDefault,
+    } = req.body;
 
-    if (!fullName || !phoneNumber || !streetAddress || !city || !state || !postalCode) {
-      return res.status(400).json({ message: 'All address fields are required' });
+    if (!fullName?.trim() || !phoneNumber?.trim() || !streetAddress?.trim()) {
+      return res.status(400).json({ message: 'Full name, phone, and street address are required' });
     }
 
     const count = await Address.countDocuments({ user: req.user._id });
@@ -34,14 +45,16 @@ export const addAddress = async (req, res) => {
 
     const address = new Address({
       user: req.user._id,
-      fullName,
-      phoneNumber,
-      streetAddress,
-      city,
-      state,
-      postalCode,
-      country: country || 'India',
-      isDefault: shouldBeDefault,
+      fullName: fullName.trim(),
+      phoneNumber: phoneNumber.trim(),
+      houseFlatNo: houseFlatNo?.trim() || '',
+      streetAddress: streetAddress.trim(),
+      landmark: landmark?.trim() || '',
+      city: city?.trim() || '',
+      state: state?.trim() || '',
+      postalCode: postalCode?.trim() || '',
+      country: country?.trim() || 'India',
+      isDefault: Boolean(shouldBeDefault),
     });
 
     const saved = await address.save();
@@ -62,20 +75,33 @@ export const updateAddress = async (req, res) => {
       return res.status(404).json({ message: 'Address not found' });
     }
 
-    const { fullName, phoneNumber, streetAddress, city, state, postalCode, country, isDefault } = req.body;
+    const {
+      fullName,
+      phoneNumber,
+      houseFlatNo,
+      streetAddress,
+      landmark,
+      city,
+      state,
+      postalCode,
+      country,
+      isDefault,
+    } = req.body;
 
     if (isDefault) {
       await Address.updateMany({ user: req.user._id }, { isDefault: false });
       address.isDefault = true;
     }
 
-    if (fullName) address.fullName = fullName;
-    if (phoneNumber) address.phoneNumber = phoneNumber;
-    if (streetAddress) address.streetAddress = streetAddress;
-    if (city) address.city = city;
-    if (state) address.state = state;
-    if (postalCode) address.postalCode = postalCode;
-    if (country) address.country = country;
+    if (fullName !== undefined) address.fullName = fullName.trim();
+    if (phoneNumber !== undefined) address.phoneNumber = phoneNumber.trim();
+    if (houseFlatNo !== undefined) address.houseFlatNo = houseFlatNo.trim();
+    if (streetAddress !== undefined) address.streetAddress = streetAddress.trim();
+    if (landmark !== undefined) address.landmark = landmark.trim();
+    if (city !== undefined) address.city = city.trim();
+    if (state !== undefined) address.state = state.trim();
+    if (postalCode !== undefined) address.postalCode = postalCode.trim();
+    if (country !== undefined) address.country = country.trim();
 
     const updated = await address.save();
     res.json(updated);

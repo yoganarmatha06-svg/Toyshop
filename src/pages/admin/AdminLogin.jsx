@@ -4,6 +4,7 @@ import { Shield, Lock, Mail, ArrowRight, KeyRound } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import toyLogo from '../../assets/logo.png';
+import adminBg from '../../assets/admin-login-bg.png';
 import Loader from '../../components/Loader/Loader';
 
 const AdminLogin = () => {
@@ -46,8 +47,25 @@ const AdminLogin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4 py-12">
-      <div className="max-w-md w-full bg-slate-800 rounded-3xl p-8 sm:p-10 border border-slate-700 shadow-2xl space-y-6">
+    <div className="relative min-h-screen w-full flex items-center justify-center px-4 py-12 overflow-hidden bg-slate-950">
+      {/* 3D Toy World Miniature Background (Full-Screen 100vh / 100vw) */}
+      <div className="fixed inset-0 w-screen h-screen overflow-hidden pointer-events-none z-0">
+        <div
+          className="w-full h-full bg-cover bg-center animate-subtle-float"
+          style={{
+            backgroundImage: `url(${adminBg})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            width: '100vw',
+            height: '100vh',
+          }}
+        />
+        {/* Soft ambient overlay ensuring high contrast & readability for the login form */}
+        <div className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]" />
+      </div>
+
+      <div className="relative z-10 max-w-md w-full bg-slate-800 rounded-3xl p-8 sm:p-10 border border-slate-700 shadow-2xl space-y-6">
         {/* Header */}
         <div className="text-center space-y-3">
           <img

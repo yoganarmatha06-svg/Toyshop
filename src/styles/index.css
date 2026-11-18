@@ -58,3 +58,136 @@
   background: #ec4899;
 }
 
+/* Subtle 3D background floating animation */
+@keyframes subtleFloat {
+  0%, 100% {
+    transform: scale(1.03) translateY(0px);
+  }
+  50% {
+    transform: scale(1.06) translateY(-8px);
+  }
+}
+
+.animate-subtle-float {
+  animation: subtleFloat 16s ease-in-out infinite;
+}
+
+/* Remove default number input spin buttons / stepper arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ========================================================
+   About Page Text-Only Animations
+   ======================================================== */
+@keyframes aboutWordReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aboutFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aboutSlideLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes aboutElegantReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes aboutCtaSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-word-reveal {
+  opacity: 0;
+  animation: aboutWordReveal 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-text-fade-up {
+  opacity: 0;
+  animation: aboutFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-text-slide-left {
+  opacity: 0;
+  animation: aboutSlideLeft 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-text-elegant {
+  opacity: 0;
+  animation: aboutElegantReveal 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-stagger-title {
+  opacity: 0;
+  animation: aboutFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-stagger-desc {
+  opacity: 0;
+  animation: aboutFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-cta-text {
+  opacity: 0;
+  animation: aboutCtaSlideUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-word-reveal,
+  .animate-text-fade-up,
+  .animate-text-slide-left,
+  .animate-text-elegant,
+  .animate-stagger-title,
+  .animate-stagger-desc,
+  .animate-cta-text {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+

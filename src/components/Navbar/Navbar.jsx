@@ -69,8 +69,9 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Shop All Toys', path: '/shop' },
+    { name: 'Our Toys', path: '/shop' },
     { name: 'Best Sellers', path: '/shop?sort=popular' },
+    { name: 'About Us', path: '/about' },
   ];
 
   return (
@@ -255,8 +256,9 @@ const Navbar = () => {
             }
           >
             {link.name === 'Home' && '🏠'}
-            {link.name === 'Shop All Toys' && '🧸'}
+            {(link.name === 'Our Toys' || link.name === 'Our Toy' || link.name === 'Shop All Toys') && '🧸'}
             {link.name === 'Best Sellers' && '⭐'}
+            {link.name === 'About Us' && '✨'}
             <span>{link.name}</span>
           </NavLink>
         ))}
@@ -332,8 +334,9 @@ const Navbar = () => {
                       }
                     >
                       {link.name === 'Home' && <HomeIcon className="w-5 h-5" />}
-                      {link.name === 'Shop All Toys' && <ShoppingBag className="w-5 h-5" />}
+                      {(link.name === 'Our Toys' || link.name === 'Our Toy' || link.name === 'Shop All Toys') && <ShoppingBag className="w-5 h-5" />}
                       {link.name === 'Best Sellers' && <PackageCheck className="w-5 h-5" />}
+                      {link.name === 'About Us' && <Sparkles className="w-5 h-5" />}
                       <span>{link.name}</span>
                     </NavLink>
                   ))}

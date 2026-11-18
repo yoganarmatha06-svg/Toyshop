@@ -291,8 +291,16 @@ const MyOrders = () => {
                         {order.shippingAddress?.fullName || 'Customer'}
                       </p>
                       <p className="leading-relaxed text-slate-600 mt-1">
-                        {order.shippingAddress?.streetAddress}, {order.shippingAddress?.city},{' '}
-                        {order.shippingAddress?.state} - {order.shippingAddress?.postalCode}
+                        {[
+                          order.shippingAddress?.houseFlatNo,
+                          order.shippingAddress?.streetAddress,
+                          order.shippingAddress?.landmark ? `(Landmark: ${order.shippingAddress.landmark})` : null,
+                          order.shippingAddress?.city,
+                          order.shippingAddress?.state,
+                        ]
+                          .filter(Boolean)
+                          .join(', ')}
+                        {order.shippingAddress?.postalCode ? ` - ${order.shippingAddress.postalCode}` : ''}
                       </p>
                       <p className="font-semibold text-slate-800 mt-2">
                         📞 Phone: {order.shippingAddress?.phoneNumber}

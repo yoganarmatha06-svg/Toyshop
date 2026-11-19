@@ -329,7 +329,7 @@ const AddToCartModal = ({ isOpen, onClose, onConfirm, product, quantity = 1, loa
               {/* Trust Badge */}
               <div className="flex items-center gap-2 text-[11px] text-slate-600 bg-slate-50 px-3 py-2 rounded-xl">
                 <ShieldCheck className="w-4 h-4 text-emerald-800 shrink-0" />
-                <span>Your details are safely stored in our database for fast toy delivery.</span>
+                <span>Your details are saved securely for fast toy delivery.</span>
               </div>
 
               {/* Actions */}
@@ -350,7 +350,7 @@ const AddToCartModal = ({ isOpen, onClose, onConfirm, product, quantity = 1, loa
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Saving to Database...</span>
+                      <span>Adding to Cart...</span>
                     </>
                   ) : (
                     <>

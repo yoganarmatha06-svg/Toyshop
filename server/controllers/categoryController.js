@@ -6,7 +6,16 @@ import Product from '../models/Product.js';
 // @access  Public
 export const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find({}).sort({ name: 1 });
+    const keyword = req.query.keyword
+      ? {
+          $or: [
+            { name: { $regex: req.query.keyword, $options: 'i' } },
+            { description: { $regex: req.query.keyword, $options: 'i' } },
+          ],
+        }
+      : {};
+
+    const categories = await Category.find(keyword).sort({ name: 1 });
 
     // Attach product count to each category
     const categoriesWithCount = await Promise.all(

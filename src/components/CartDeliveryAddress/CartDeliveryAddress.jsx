@@ -664,7 +664,7 @@ const CartDeliveryAddress = ({
               {saving ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  <span>Saving to MongoDB...</span>
+                  <span>Saving Address...</span>
                 </>
               ) : (
                 <span>Save Address</span>

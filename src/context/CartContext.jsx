@@ -147,7 +147,7 @@ export const CartProvider = ({ children }) => {
           setAuthData(data.user, data.token);
         }
 
-        addToast('Toy added to your cart successfully! 🛍️', 'success');
+        addToast('Added to cart successfully! 🛍️', 'success');
         return true;
       } catch (err) {
         console.error('Direct add to cart failed:', err);
@@ -209,7 +209,7 @@ export const CartProvider = ({ children }) => {
 
       // Close modal
       closeAddToCartModal();
-      addToast('Toy added to your cart successfully! 🛍️', 'success');
+      addToast('Added to cart successfully! 🛍️', 'success');
       return true;
     } catch (err) {
       console.error('Add to cart failed:', err);

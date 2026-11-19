@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, FolderTree, X, Check, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit2, Trash2, FolderTree, X, Check, Image as ImageIcon, Search } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
 import Loader from '../../components/Loader/Loader';
@@ -9,6 +9,7 @@ const ManageCategories = () => {
   const { addToast } = useToast();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
 
@@ -32,6 +33,14 @@ const ManageCategories = () => {
       setLoading(false);
     }
   };
+
+  const filteredCategories = categories.filter((cat) => {
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase().trim();
+    const nameMatch = cat.name?.toLowerCase().includes(term);
+    const descMatch = cat.description?.toLowerCase().includes(term);
+    return nameMatch || descMatch;
+  });
 
   useEffect(() => {
     fetchCategories();
@@ -118,11 +127,68 @@ const ManageCategories = () => {
         </button>
       </div>
 
+      {/* Search and Filter Bar */}
+      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search categories by name or description..."
+            className="w-full pl-10 pr-9 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 font-medium text-slate-800 transition-all"
+          />
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={() => setSearchTerm('')}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 self-start sm:self-auto text-xs font-bold text-slate-500">
+          <span className="px-3 py-1.5 bg-slate-100 rounded-full border border-slate-200/60 flex items-center gap-1.5">
+            <FolderTree className="w-3.5 h-3.5 text-pink-500" />
+            {searchTerm.trim() ? (
+              <>
+                Found: <strong className="text-slate-900">{filteredCategories.length}</strong> of {categories.length} categories
+              </>
+            ) : (
+              <>
+                Total: <strong className="text-slate-900">{categories.length}</strong> categories
+              </>
+            )}
+          </span>
+        </div>
+      </div>
+
       {loading ? (
         <Loader text="Loading categories..." />
+      ) : filteredCategories.length === 0 ? (
+        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 space-y-3">
+          <FolderTree className="w-12 h-12 text-slate-300 mx-auto" />
+          <h3 className="text-base font-bold text-slate-800">No categories found</h3>
+          <p className="text-xs text-slate-400">
+            {searchTerm.trim()
+              ? `No category matching "${searchTerm}" was found.`
+              : 'No categories exist yet. Click "+ Add New Category" to create one.'}
+          </p>
+          {searchTerm.trim() && (
+            <button
+              onClick={() => setSearchTerm('')}
+              className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+            >
+              Clear Search
+            </button>
+          )}
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {categories.map((cat) => {
+          {filteredCategories.map((cat) => {
             const catImg = getCategoryImage(cat);
             return (
               <div

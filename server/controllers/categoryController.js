@@ -1,5 +1,7 @@
+import fs from 'fs';
 import Category from '../models/Category.js';
 import Product from '../models/Product.js';
+import { uploadToCloudinary, isCloudinaryConfigured } from '../config/cloudinary.js';
 
 // @desc    Get all categories with product count
 // @route   GET /api/categories
@@ -140,6 +142,53 @@ export const deleteCategory = async (req, res) => {
     res.json({ message: 'Category deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message || 'Failed to delete category' });
+  }
+};
+
+// @desc    Upload category image to Cloudinary (with fallback to local storage)
+// @route   POST /api/categories/upload
+// @access  Private/Admin
+export const uploadCategoryImage = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'No image file uploaded' });
+  }
+
+  try {
+    // If Cloudinary is configured, upload directly to Cloudinary
+    if (isCloudinaryConfigured()) {
+      const cloudUrl = await uploadToCloudinary(req.file.path, 'toystore/categories');
+      // Delete temporary local file from disk after successful Cloudinary upload
+      try {
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+      } catch (unlinkErr) {
+        console.warn('Could not remove temporary local file:', unlinkErr.message);
+      }
+
+      return res.json({
+        message: 'Category image uploaded to Cloudinary successfully! ☁️',
+        imageUrl: cloudUrl,
+        storage: 'cloudinary',
+      });
+    }
+
+    // Local storage fallback
+    const localUrl = `/uploads/${req.file.filename}`;
+    return res.json({
+      message: 'Category image uploaded locally',
+      imageUrl: localUrl,
+      storage: 'local',
+    });
+  } catch (error) {
+    console.error('Error during category image upload:', error);
+    const localUrl = `/uploads/${req.file.filename}`;
+    return res.json({
+      message: 'Cloudinary upload failed, saved locally',
+      imageUrl: localUrl,
+      storage: 'local',
+      error: error.message,
+    });
   }
 };
 

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import api from '../../services/api';
 import { useToast } from '../../context/ToastContext';
+import { cleanImageUrl, parseImageUrls, resolveProductImageUrl } from '../../utils/imageUrlHelper';
 
 const AddProduct = () => {
   const { addToast } = useToast();
@@ -59,17 +60,15 @@ const AddProduct = () => {
     if (e) e.preventDefault();
     if (!newImageUrl.trim()) return;
 
-    // Split by commas, newlines, or whitespace to support pasting multiple URLs at once
-    const urls = newImageUrl
-      .split(/[\n,\s]+/)
-      .map((u) => u.trim())
-      .filter((u) => u.length > 0);
+    const urls = parseImageUrls(newImageUrl);
 
     if (urls.length > 0) {
       setImageUrls((prev) => [...prev, ...urls]);
       setNewImageUrl('');
       setPreviewUrlError(false);
       addToast(`${urls.length} image(s) added! 🖼️`, 'success');
+    } else {
+      addToast('Please enter a valid image URL', 'error');
     }
   };
 
@@ -166,10 +165,7 @@ const AddProduct = () => {
     // Auto-commit any pending URL the user might have pasted into the input without clicking 'Add'
     let finalImages = [...imageUrls];
     if (newImageUrl.trim()) {
-      const extraUrls = newImageUrl
-        .split(/[\n,\s]+/)
-        .map((u) => u.trim())
-        .filter((u) => u.length > 0);
+      const extraUrls = parseImageUrls(newImageUrl);
       finalImages = [...finalImages, ...extraUrls];
     }
 
@@ -425,64 +421,73 @@ const AddProduct = () => {
                 </div>
 
                 {/* Instant Live URL Preview (Shows immediately without backend server) */}
-                {newImageUrl.trim().length > 8 && (
-                  <div className="p-2.5 bg-white border border-pink-200 rounded-2xl flex items-center gap-3 shadow-xs transition-all">
-                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center relative">
-                      {!previewUrlError ? (
-                        <img
-                          src={newImageUrl.trim()}
-                          alt="Live URL Preview"
-                          className="w-full h-full object-cover"
-                          onLoad={() => setPreviewUrlError(false)}
-                          onError={() => setPreviewUrlError(true)}
-                        />
-                      ) : (
-                        <div className="p-1 text-center">
-                          <AlertCircle className="w-5 h-5 text-rose-500 mx-auto" />
-                          <span className="text-[8px] text-rose-500 font-bold block leading-tight mt-0.5">Broken Link</span>
+                {(() => {
+                  const cleanedPreview = cleanImageUrl(newImageUrl);
+                  if (cleanedPreview.length > 8) {
+                    return (
+                      <div className="p-2.5 bg-white border border-pink-200 rounded-2xl flex items-center gap-3 shadow-xs transition-all">
+                        <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0 flex items-center justify-center relative">
+                          {!previewUrlError ? (
+                            <img
+                              src={cleanedPreview}
+                              alt="Live URL Preview"
+                              referrerPolicy="no-referrer"
+                              className="w-full h-full object-cover"
+                              onLoad={() => setPreviewUrlError(false)}
+                              onError={() => setPreviewUrlError(true)}
+                            />
+                          ) : (
+                            <div className="p-1 text-center">
+                              <AlertCircle className="w-5 h-5 text-rose-500 mx-auto" />
+                              <span className="text-[8px] text-rose-500 font-bold block leading-tight mt-0.5">
+                                Broken Link
+                              </span>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        {!previewUrlError ? (
-                          <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
-                            <CheckCircle2 className="w-3.5 h-3.5" /> Instant Image Preview Ready
-                          </span>
-                        ) : (
-                          <span className="text-xs font-bold text-rose-600 flex items-center gap-1">
-                            <AlertCircle className="w-3.5 h-3.5" /> Image failed to load
-                          </span>
-                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            {!previewUrlError ? (
+                              <span className="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                                <CheckCircle2 className="w-3.5 h-3.5" /> Instant Image Preview Ready
+                              </span>
+                            ) : (
+                              <span className="text-xs font-bold text-rose-600 flex items-center gap-1">
+                                <AlertCircle className="w-3.5 h-3.5" /> Image failed to load
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-500 truncate mt-0.5 font-mono">
+                            {cleanedPreview}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <button
+                              type="button"
+                              onClick={handleAddImageUrl}
+                              className="px-3 py-1 bg-pink-500 hover:bg-pink-600 text-white rounded-lg text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
+                            >
+                              + Add to Product
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setNewImageUrl('');
+                                setPreviewUrlError(false);
+                              }}
+                              className="px-2 py-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+                            >
+                              Clear
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <p className="text-[10px] text-slate-500 truncate mt-0.5 font-mono">
-                        {newImageUrl.trim()}
-                      </p>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <button
-                          type="button"
-                          onClick={handleAddImageUrl}
-                          className="px-3 py-1 bg-pink-500 hover:bg-pink-600 text-white rounded-lg text-xs font-bold shadow-xs active:scale-95 transition-all cursor-pointer"
-                        >
-                          + Add to Product
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setNewImageUrl('');
-                            setPreviewUrlError(false);
-                          }}
-                          className="px-2 py-1 text-[11px] font-bold text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
-                        >
-                          Clear
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                    );
+                  }
+                  return null;
+                })()}
 
                 <p className="text-[10px] text-slate-400">
-                  Tip: Press Enter or click Add to add multiple URLs. Stored directly to MongoDB!
+                  Tip: Press Enter or click Add to add image URL. Supports Google, Unsplash, Amazon & CDN links!
                 </p>
               </div>
             </div>
@@ -502,8 +507,10 @@ const AddProduct = () => {
                     <img
                       src={img}
                       alt={`Toy preview ${idx + 1}`}
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover"
                       onError={(e) => {
+                        e.currentTarget.onerror = null;
                         e.currentTarget.src =
                           'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=300&q=80';
                       }}

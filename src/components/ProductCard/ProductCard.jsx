@@ -118,7 +118,9 @@ const FeaturedTiltImage = ({ product, isOutOfStock }) => {
         <img
           src={product.productImages?.[0] || '/logo.png'}
           alt={product.name}
+          referrerPolicy="no-referrer"
           onError={(e) => {
+            e.currentTarget.onerror = null;
             e.currentTarget.src = '/logo.png';
           }}
           className="w-full h-full object-cover object-center select-none"
@@ -206,7 +208,9 @@ const ProductCardInner = ({
         <img
           src={product.productImages?.[0] || '/logo.png'}
           alt={product.name}
+          referrerPolicy="no-referrer"
           onError={(e) => {
+            e.currentTarget.onerror = null;
             e.currentTarget.src = '/logo.png';
           }}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out select-none"

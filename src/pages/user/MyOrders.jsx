@@ -10,6 +10,7 @@ import {
   Truck,
   RotateCcw,
   ShoppingBag,
+  ArrowLeft,
 } from 'lucide-react';
 import api from '../../services/api';
 import Loader from '../../components/Loader/Loader';
@@ -86,14 +87,34 @@ const MyOrders = () => {
         </div>
       )}
 
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
-          My Toy Orders 📦
-        </h1>
-        <p className="text-xs text-slate-500 font-medium">
-          Track real-time courier status and review your toy order history
-        </p>
+      {/* Header with Back Arrow to Home */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-white hover:bg-pink-50 text-slate-700 hover:text-pink-600 border border-slate-200 hover:border-pink-300 shadow-xs hover:shadow-md active:scale-95 transition-all group shrink-0 cursor-pointer"
+            aria-label="Back to Home"
+            title="Back to Home"
+          >
+            <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-1" />
+          </Link>
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
+              My Toy Orders 📦
+            </h1>
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
+              Track real-time courier status and review your toy order history
+            </p>
+          </div>
+        </div>
+
+        <Link
+          to="/"
+          className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-pink-50 text-slate-700 hover:text-pink-600 text-xs font-bold border border-slate-200 hover:border-pink-300 shadow-xs hover:shadow-md active:scale-95 transition-all group cursor-pointer self-start sm:self-auto"
+        >
+          <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" />
+          <span>Back to Home</span>
+        </Link>
       </div>
 
       {orders.length === 0 ? (

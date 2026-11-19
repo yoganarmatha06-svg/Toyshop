@@ -27,6 +27,11 @@ export const registerUser = async (req, res) => {
       return res.status(400).json({ message: 'Password must be at least 6 characters long' });
     }
 
+    const cleanPhone = phone ? String(phone).replace(/\D/g, '') : '';
+    if (!cleanPhone || cleanPhone.length !== 10) {
+      return res.status(400).json({ message: 'Please provide a valid 10-digit phone number' });
+    }
+
     const normalizedEmail = email.toLowerCase().trim();
     const userExists = await User.findOne({ email: normalizedEmail });
     if (userExists) {
@@ -37,7 +42,7 @@ export const registerUser = async (req, res) => {
       name: name.trim(),
       email: normalizedEmail,
       password,
-      phone: phone ? phone.trim() : '',
+      phone: cleanPhone,
     });
 
     if (user) {

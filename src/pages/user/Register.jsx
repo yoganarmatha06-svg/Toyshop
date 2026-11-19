@@ -17,8 +17,30 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const handlePhoneChange = (e) => {
+    // Only allow numbers (0-9) and limit to exactly 10 digits
+    const cleaned = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhone(cleaned);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!name.trim()) {
+      addToast('Please enter your full name', 'error');
+      return;
+    }
+    if (!email.trim()) {
+      addToast('Please enter your email address', 'error');
+      return;
+    }
+    if (!phone.trim()) {
+      addToast('Please enter your 10-digit phone number', 'error');
+      return;
+    }
+    if (phone.length !== 10) {
+      addToast('Phone number must be exactly 10 digits', 'error');
+      return;
+    }
     if (!password) {
       addToast('Please enter a password', 'error');
       return;
@@ -30,7 +52,7 @@ const Register = () => {
 
     try {
       setLoading(true);
-      await register(name, email, password, phone);
+      await register(name.trim(), email.trim(), password, phone.trim());
       addToast('Account created successfully! Welcome aboard! 🎈', 'success');
       navigate('/');
     } catch (err) {
@@ -91,17 +113,37 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number (optional)</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-bold text-slate-700">Phone Number *</label>
+              <span
+                className={`text-[10px] font-bold ${
+                  phone.length === 10
+                    ? 'text-emerald-600'
+                    : phone.length > 0
+                    ? 'text-pink-500'
+                    : 'text-slate-400'
+                }`}
+              >
+                {phone.length}/10 digits
+              </span>
+            </div>
             <div className="relative">
               <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="tel"
+                inputMode="numeric"
+                pattern="[0-9]{10}"
+                maxLength={10}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 9876543210"
-                className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400"
+                onChange={handlePhoneChange}
+                placeholder="9876543210"
+                className="w-full pl-10 pr-4 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 font-mono tracking-wider"
+                required
               />
             </div>
+            <p className="text-[10px] text-slate-400 mt-1">
+              Must be exactly 10 digits (numbers only)
+            </p>
           </div>
 
           <div>

@@ -1,128 +1,55 @@
-import buildingBlocksImg from '../assets/bulidingblocks.jpg';
-import babyToyImg from '../assets/babytoy.jpg';
-import boardGamesImg from '../assets/boared toys.jpg';
-import carsAndVehiclesImg from '../assets/car and vechile.jpg';
-import dollImg from '../assets/doll.jpg';
-import remoteControlImg from '../assets/remote.jpg';
-import outdoorImg from '../assets/outer copy.jpg';
-import puzzleGameImg from '../assets/puzzle game.png';
+/**
+ * Resolves local or remote category image paths to an absolute or accessible URL.
+ */
+export const resolveCategoryImageUrl = (image) => {
+  if (!image || typeof image !== 'string') return '';
+  const trimmed = image.trim();
+  if (
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('data:') ||
+    trimmed.startsWith('blob:')
+  ) {
+    return trimmed;
+  }
+
+  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  if (import.meta.env.DEV) {
+    return cleanPath;
+  }
+
+  // In production, attach backend host if relative
+  const apiBase = (import.meta.env.VITE_API_URL || 'https://toyshop-6xha.onrender.com')
+    .replace(/\/api\/?$/, '')
+    .replace(/\/+$/, '');
+  return `${apiBase}${cleanPath}`;
+};
 
 /**
- * Returns the exact image asset and display configuration for a given category.
- * Matches by category name or slug to ensure identical visual display between
- * the website's Explore 10 Toy Categories and the Admin Categories panel.
+ * Returns the dynamic category image stored in MongoDB.
+ * Priority:
+ * 1. category.image from the database (Cloudinary, local /uploads/, or external URL)
+ * 2. High-quality default toy placeholder if no image is uploaded
  */
 export const getCategoryImage = (category) => {
   if (!category) return null;
 
-  const name = (category.name || '').toLowerCase();
-  const slug = (category.slug || '').toLowerCase();
-
-  // 1. Building Blocks
-  if (name.includes('building') || name.includes('block') || slug === 'building-blocks') {
+  // 1. Primary: Use the actual image stored in MongoDB database
+  if (category.image && typeof category.image === 'string' && category.image.trim() !== '') {
     return {
-      src: buildingBlocksImg,
-      alt: category.name || 'Building Blocks',
-      fit: 'contain',
-      padding: 'p-1',
-    };
-  }
-
-  // 2. Baby Toys
-  if (name.includes('baby') || slug === 'baby-toys') {
-    return {
-      src: babyToyImg,
-      alt: category.name || 'Baby Toys',
-      fit: 'cover',
-      padding: 'p-0',
-    };
-  }
-
-  // 3. Board Games
-  if (name.includes('board') || slug === 'board-games') {
-    return {
-      src: boardGamesImg,
-      alt: category.name || 'Board Games',
-      fit: 'cover',
-      padding: 'p-0',
-    };
-  }
-
-  // 4. Cars and Vehicles
-  if (
-    slug === 'cars-and-vehicles' ||
-    name.includes('vehicle') ||
-    name.includes('vechile') ||
-    (name.includes('car') && !name.includes('remote') && !name.includes('control'))
-  ) {
-    return {
-      src: carsAndVehiclesImg,
-      alt: category.name || 'Cars and Vehicles',
-      fit: 'cover',
-      padding: 'p-0',
-    };
-  }
-
-  // 5. Dolls
-  if (name.includes('doll') || slug === 'dolls') {
-    return {
-      src: dollImg,
-      alt: category.name || 'Dolls',
-      fit: 'contain',
-      padding: 'p-1',
-    };
-  }
-
-  // 6. Remote Control Toys
-  if (
-    slug === 'remote-control-toys' ||
-    name.includes('remote') ||
-    name.includes('rc') ||
-    name.includes('control car')
-  ) {
-    return {
-      src: remoteControlImg,
-      alt: category.name || 'Remote Control Toys',
-      fit: 'contain',
-      padding: 'p-1',
-    };
-  }
-
-  // 7. Outdoor Toys (Outer toys)
-  if (
-    name.includes('outdoor') ||
-    name.includes('outer') ||
-    slug.includes('outdoor') ||
-    slug.includes('outer')
-  ) {
-    return {
-      src: outdoorImg,
-      alt: category.name || 'Outdoor Toys',
-      fit: 'cover',
-      padding: 'p-0',
-    };
-  }
-
-  // 8. Puzzle Games
-  if (name.includes('puzzle') || slug.includes('puzzle')) {
-    return {
-      src: puzzleGameImg,
-      alt: category.name || 'Puzzle Games',
-      fit: 'contain',
-      padding: 'p-1',
-    };
-  }
-
-  // Fallback to URL in category.image if valid external image
-  if (category.image && typeof category.image === 'string' && category.image.startsWith('http')) {
-    return {
-      src: category.image,
+      src: resolveCategoryImageUrl(category.image),
       alt: category.name || 'Category',
       fit: 'cover',
-      padding: 'p-0',
+      hasCustomImage: true,
     };
   }
 
-  return null;
+  // 2. Fallback: High-quality default toy image (no emoji icons as images)
+  return {
+    src: 'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=600&q=80',
+    alt: category.name || 'Category',
+    fit: 'cover',
+    hasCustomImage: false,
+  };
 };
 

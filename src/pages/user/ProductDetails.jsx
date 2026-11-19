@@ -171,7 +171,9 @@ const ProductDetails = () => {
                 '/logo.png'
               }
               alt={product.name}
+              referrerPolicy="no-referrer"
               onError={(e) => {
+                e.currentTarget.onerror = null;
                 e.currentTarget.src = '/logo.png';
               }}
               className="w-full h-full object-cover object-center"
@@ -196,7 +198,7 @@ const ProductDetails = () => {
                       : 'border-slate-200 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={img} alt={`${product.name} ${idx}`} className="w-full h-full object-cover" />
+                  <img src={img} alt={`${product.name} ${idx}`} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>

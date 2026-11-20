@@ -188,28 +188,28 @@ const ManageCategories = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 w-full max-w-full">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-xs">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 font-heading">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 font-heading">
             Toy Product Categories 📂
           </h1>
-          <p className="text-xs text-slate-500 font-medium">
+          <p className="text-xs text-slate-500 font-medium mt-0.5">
             Manage category images, names, colors, and descriptions dynamically stored in MongoDB
           </p>
         </div>
 
         <button
           onClick={openAddModal}
-          className="px-5 py-2.5 rounded-full bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow-md shadow-pink-200 flex items-center gap-2 self-start sm:self-auto active:scale-95 transition-all cursor-pointer"
+          className="w-full sm:w-auto justify-center min-h-[44px] px-5 py-2.5 rounded-full bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs shadow-md shadow-pink-200 flex items-center gap-2 self-start sm:self-auto active:scale-95 transition-all cursor-pointer"
         >
           <Plus className="w-4 h-4" /> Add New Category
         </button>
       </div>
 
       {/* Search and Filter Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
@@ -217,7 +217,7 @@ const ManageCategories = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search categories by name or description..."
-            className="w-full pl-10 pr-9 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 font-medium text-slate-800 transition-all"
+            className="w-full pl-10 pr-9 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-pink-400 font-medium text-slate-800 transition-all min-h-[42px]"
           />
           {searchTerm && (
             <button
@@ -268,7 +268,7 @@ const ManageCategories = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-4">
           {filteredCategories.map((cat) => {
             const hasImg = Boolean(cat.image && cat.image.trim());
             const catImg = getCategoryImage(cat);
@@ -337,16 +337,16 @@ const ManageCategories = () => {
 
       {/* Add / Edit Category Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs" onClick={() => setModalOpen(false)} />
-          <div className="relative bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl space-y-5 z-10 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between border-b pb-3">
+          <div className="relative bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 max-w-md w-full shadow-2xl space-y-4 sm:space-y-5 z-10 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h2 className="text-base font-black text-slate-900 font-heading">
                 {editingCategory ? 'Edit Category' : 'Create New Category'}
               </h2>
               <button
                 onClick={() => setModalOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -354,7 +354,7 @@ const ManageCategories = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Category Image Profile-Style Preview & Upload Section */}
-              <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3">
+              <div className="p-3.5 sm:p-4 bg-slate-50/80 rounded-2xl border border-slate-200/80 space-y-3">
                 <div className="text-center">
                   <label className="block text-xs font-bold text-slate-700">Category Image</label>
                   <p className="text-[11px] text-slate-400">
@@ -405,7 +405,7 @@ const ManageCategories = () => {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploadingImage}
-                    className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-pink-500 hover:bg-pink-600 text-white shadow-xs inline-flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                    className="px-3.5 py-2 min-h-[38px] rounded-full text-xs font-bold bg-pink-500 hover:bg-pink-600 text-white shadow-xs inline-flex items-center justify-center gap-1.5 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     {image ? 'Change Image' : 'Upload Image'}
@@ -416,7 +416,7 @@ const ManageCategories = () => {
                       type="button"
                       onClick={handleRemoveImage}
                       disabled={uploadingImage}
-                      className="px-3 py-1.5 rounded-full text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 inline-flex items-center gap-1 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                      className="px-3.5 py-2 min-h-[38px] rounded-full text-xs font-bold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 inline-flex items-center justify-center gap-1 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       Remove Image
@@ -435,13 +435,13 @@ const ManageCategories = () => {
                       value={image}
                       onChange={(e) => setImage(e.target.value)}
                       placeholder="https://example.com/toy-image.jpg"
-                      className="w-full px-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400 font-medium text-slate-800 pr-8"
+                      className="w-full px-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400 font-medium text-slate-800 pr-8 min-h-[38px]"
                     />
                     {image && (
                       <button
                         type="button"
                         onClick={() => setImage('')}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
                         title="Clear URL"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -461,7 +461,7 @@ const ManageCategories = () => {
                   placeholder="e.g. Remote Control Toys"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400 font-medium text-slate-800"
+                  className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400 font-medium text-slate-800 min-h-[42px]"
                   required
                 />
               </div>
@@ -475,7 +475,7 @@ const ManageCategories = () => {
                   type="color"
                   value={color}
                   onChange={(e) => setColor(e.target.value)}
-                  className="w-full h-10 p-1 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer"
+                  className="w-full h-11 p-1 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer"
                 />
               </div>
 
@@ -489,22 +489,22 @@ const ManageCategories = () => {
                   placeholder="Short tagline about toys in this category..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400 font-medium text-slate-800"
+                  className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-pink-400 font-medium text-slate-800 min-h-[64px]"
                 />
               </div>
 
-              <div className="pt-2 flex items-center justify-end gap-2 border-t">
+              <div className="pt-3 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 cursor-pointer"
+                  className="w-full sm:w-auto min-h-[42px] px-4 py-2 text-xs font-bold text-slate-500 hover:text-slate-700 cursor-pointer flex items-center justify-center rounded-xl sm:rounded-full bg-slate-100 sm:bg-transparent transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting || uploadingImage}
-                  className="px-6 py-2.5 bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs rounded-full shadow-sm disabled:opacity-50 cursor-pointer active:scale-95 transition-all"
+                  className="w-full sm:w-auto min-h-[42px] px-6 py-2.5 bg-pink-500 hover:bg-pink-600 text-white font-bold text-xs rounded-full shadow-sm disabled:opacity-50 cursor-pointer active:scale-95 transition-all flex items-center justify-center"
                 >
                   {submitting ? 'Saving...' : 'Save Category'}
                 </button>

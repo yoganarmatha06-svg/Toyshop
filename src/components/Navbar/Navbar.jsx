@@ -71,9 +71,9 @@ const Navbar = () => {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Our Toys', path: '/shop' },
-    { name: 'Best Sellers', path: '/shop?sort=popular' },
     { name: 'About', path: '/about' },
+    { name: 'Our Toy', path: '/shop' },
+    { name: 'Best Seller', path: '/shop?sort=popular' },
   ];
 
   const isLinkActive = (path) => {
@@ -281,7 +281,7 @@ const Navbar = () => {
             <span className="text-[12px] flex-shrink-0">
               {link.name === 'Home' && '🏠'}
               {(link.name === 'Our Toys' || link.name === 'Our Toy' || link.name === 'Shop All Toys') && '🧸'}
-              {link.name === 'Best Sellers' && '⭐'}
+              {(link.name === 'Best Sellers' || link.name === 'Best Seller') && '⭐'}
               {(link.name === 'About' || link.name === 'About Us') && '✨'}
             </span>
             <span className="truncate">{link.name}</span>
@@ -360,7 +360,7 @@ const Navbar = () => {
                       >
                         {link.name === 'Home' && <HomeIcon className="w-5 h-5" />}
                         {(link.name === 'Our Toys' || link.name === 'Our Toy' || link.name === 'Shop All Toys') && <ShoppingBag className="w-5 h-5" />}
-                        {link.name === 'Best Sellers' && <PackageCheck className="w-5 h-5" />}
+                        {(link.name === 'Best Sellers' || link.name === 'Best Seller') && <PackageCheck className="w-5 h-5" />}
                         {(link.name === 'About' || link.name === 'About Us') && <Info className="w-5 h-5" />}
                         <span>{link.name}</span>
                       </Link>

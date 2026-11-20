@@ -240,12 +240,12 @@ const EditProduct = () => {
         </span>
       </div>
 
-      <div className="bg-white rounded-3xl p-6 sm:p-10 border border-slate-200 shadow-xs space-y-8">
+      <div className="bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-10 border border-slate-200 shadow-xs space-y-6 sm:space-y-8">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 font-heading">
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 font-heading">
             Edit Toy Details ✏️
           </h1>
-          <p className="text-xs text-slate-500 font-medium">
+          <p className="text-xs text-slate-500 font-medium mt-0.5">
             Update pricing, replenish inventory stock, edit description, or manage photo gallery
           </p>
         </div>
@@ -668,17 +668,17 @@ const EditProduct = () => {
             </label>
           </div>
 
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+          <div className="pt-4 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2.5 sm:gap-3">
             <Link
               to="/admin/products"
-              className="px-6 py-3 rounded-full text-xs font-bold text-slate-600 hover:bg-slate-100"
+              className="w-full sm:w-auto px-6 py-3 rounded-full text-xs font-bold text-slate-600 hover:bg-slate-100 text-center min-h-[44px] flex items-center justify-center transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={submitting}
-              className="px-8 py-3.5 rounded-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xs shadow-md shadow-pink-200 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xs shadow-md shadow-pink-200 active:scale-95 disabled:opacity-50 transition-all flex items-center justify-center gap-2 min-h-[44px]"
             >
               <Save className="w-4 h-4" />
               <span>{submitting ? 'Saving Changes...' : 'Save Updated Toy Details'}</span>
